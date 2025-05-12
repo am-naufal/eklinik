@@ -15,34 +15,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Jalankan role seeder terlebih dahulu
-        $this->call(RoleSeeder::class);
+        // \App\Models\User::factory(10)->create();
 
-        // Buat admin user
-        $adminRole = Role::where('name', 'admin')->first();
-        User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
-            'role_id' => $adminRole->id,
-        ]);
+        // \App\Models\User::factory()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'test@example.com',
+        // ]);
 
-        // Buat dokter user
-        $dokterRole = Role::where('name', 'dokter')->first();
-        User::factory()->create([
-            'name' => 'Dokter User',
-            'email' => 'dokter@example.com',
-            'password' => Hash::make('password'),
-            'role_id' => $dokterRole->id,
-        ]);
-
-        // Buat pasien user
-        $pasienRole = Role::where('name', 'pasien')->first();
-        User::factory()->create([
-            'name' => 'Pasien User',
-            'email' => 'pasien@example.com',
-            'password' => Hash::make('password'),
-            'role_id' => $pasienRole->id,
+        $this->call([
+            RoleSeeder::class,
+            UserSeeder::class,
+            DoctorSeeder::class,
+            PatientSeeder::class,
         ]);
     }
 }

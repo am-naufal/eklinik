@@ -18,8 +18,39 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('role')->latest()->paginate(10);
-        return view('admin.users.index', compact('users'));
+        if (request()->ajax()) {
+            $users = User::with('role')->get();
+
+            return response()->json([
+                'data' => $users->map(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'role' => $user->role ? $user->role->name : '-',
+                        'phone' => $user->phone_number ?? '-',
+                        'gender' => $user->gender ?? '-',
+                        'actions' => '
+                            <a href="' . route('admin.users.show', $user) . '" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="' . route('admin.users.edit', $user) . '" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form class="d-inline" action="' . route('admin.users.destroy', $user) . '" method="POST" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus user ini?\');">
+                                ' . csrf_field() . '
+                                ' . method_field('DELETE') . '
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        '
+                    ];
+                })
+            ]);
+        }
+
+        return view('admin.users.index');
     }
 
     /**
@@ -44,7 +75,7 @@ class UserController extends Controller
             'phone_number' => ['nullable', 'string', 'max:15'],
             'address' => ['nullable', 'string'],
             'age' => ['nullable', 'integer', 'min:0', 'max:120'],
-            'gender' => ['nullable', 'in:male,female'],
+            'gender' => ['nullable', 'in:laki-laki,perempuan'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
         ]);
 
@@ -63,7 +94,7 @@ class UserController extends Controller
         if ($request->hasFile('photo')) {
             $photo = $request->file('photo');
             $filename = time() . '_' . $photo->getClientOriginalName();
-            $photo->storeAs('public/user_photos', $filename);
+            $photo->storeAs('user_photos', $filename, 'public');
             $data['photo'] = $filename;
         }
 
@@ -102,7 +133,7 @@ class UserController extends Controller
             'phone_number' => ['nullable', 'string', 'max:15'],
             'address' => ['nullable', 'string'],
             'age' => ['nullable', 'integer', 'min:0', 'max:120'],
-            'gender' => ['nullable', 'in:male,female'],
+            'gender' => ['nullable', 'in:laki-laki,perempuan'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
         ]);
 
@@ -128,12 +159,12 @@ class UserController extends Controller
         if ($request->hasFile('photo')) {
             // Hapus foto lama jika ada
             if ($user->photo) {
-                Storage::delete('public/user_photos/' . $user->photo);
+                Storage::disk('public')->delete('user_photos/' . $user->photo);
             }
 
             $photo = $request->file('photo');
             $filename = time() . '_' . $photo->getClientOriginalName();
-            $photo->storeAs('public/user_photos', $filename);
+            $photo->storeAs('user_photos', $filename, 'public');
             $data['photo'] = $filename;
         }
 
@@ -157,7 +188,7 @@ class UserController extends Controller
 
         // Hapus foto jika ada
         if ($user->photo) {
-            Storage::delete('public/user_photos/' . $user->photo);
+            Storage::disk('public')->delete('user_photos/' . $user->photo);
         }
 
         $user->delete();

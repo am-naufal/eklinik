@@ -4,45 +4,6 @@
 
 @section('page-title', 'Dokter Dashboard')
 
-@section('sidebar')
-    <li class="nav-item">
-        <a class="nav-link active" href="{{ route('dokter.dashboard') }}">
-            <i class="fas fa-fw fa-tachometer-alt me-2"></i>
-            Dashboard
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-calendar-alt me-2"></i>
-            Jadwal Praktik
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-procedures me-2"></i>
-            Pasien Saya
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-clipboard-list me-2"></i>
-            Rekam Medis
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-pills me-2"></i>
-            Resep Obat
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-user me-2"></i>
-            Profil Saya
-        </a>
-    </li>
-@endsection
-
 @section('content')
     <div class="row">
         <div class="col-xl-3 col-md-6 mb-4">

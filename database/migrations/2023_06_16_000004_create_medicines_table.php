@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('medicines', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('code')->unique();
-            $table->text('description')->nullable();
-            $table->string('category');
-            $table->integer('stock');
-            $table->decimal('price', 10, 2);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('medicines')) {
+            Schema::create('medicines', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('code')->unique();
+                $table->text('description')->nullable();
+                $table->string('category');
+                $table->integer('stock');
+                $table->decimal('price', 10, 2);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

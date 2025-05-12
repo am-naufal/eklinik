@@ -139,9 +139,9 @@
                         <label for="gender" class="form-label">Jenis Kelamin</label>
                         <select class="form-select @error('gender') is-invalid @enderror" id="gender" name="gender">
                             <option value="">Pilih Jenis Kelamin</option>
-                            <option value="male" {{ old('gender', $user->gender) == 'male' ? 'selected' : '' }}>
+                            <option value="laki-laki" {{ old('gender', $user->gender) == 'laki-laki' ? 'selected' : '' }}>
                                 Laki-laki</option>
-                            <option value="female" {{ old('gender', $user->gender) == 'female' ? 'selected' : '' }}>
+                            <option value="perempuan" {{ old('gender', $user->gender) == 'perempuan' ? 'selected' : '' }}>
                                 Perempuan</option>
                         </select>
                         @error('gender')
@@ -164,6 +164,9 @@
                         <div class="mb-2">
                             <img src="{{ asset('storage/user_photos/' . $user->photo) }}" alt="{{ $user->name }}"
                                 class="img-thumbnail" style="max-height: 150px;">
+                            <div class="mt-1">
+                                <small class="text-muted">Path: storage/user_photos/{{ $user->photo }}</small>
+                            </div>
                         </div>
                     @endif
                     <input type="file" class="form-control @error('photo') is-invalid @enderror" id="photo"

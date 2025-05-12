@@ -8,7 +8,11 @@ use App\Http\Controllers\Admin\DoctorController;
 use App\Http\Controllers\Dokter\DashboardController as DokterDashboardController;
 use App\Http\Controllers\Dokter\MedicalRecordController;
 use App\Http\Controllers\Pasien\DashboardController as PasienDashboardController;
+use App\Http\Controllers\Admin\PatientController;
+use App\Http\Controllers\Admin\AppointmentController;
+use App\Http\Controllers\Dokter\AppointmentController as DokterAppointmentController;
 
+Route::auth();
 // Route halaman utama
 Route::get('/', function () {
     return view('welcome');
@@ -44,6 +48,28 @@ Route::prefix('admin')->middleware(['auth', \App\Http\Middleware\CheckRole::clas
         'update' => 'admin.doctors.update',
         'destroy' => 'admin.doctors.destroy',
     ]);
+
+    // Routes manajemen pasien
+    Route::resource('patients', PatientController::class)->names([
+        'index' => 'admin.patients.index',
+        'create' => 'admin.patients.create',
+        'store' => 'admin.patients.store',
+        'show' => 'admin.patients.show',
+        'edit' => 'admin.patients.edit',
+        'update' => 'admin.patients.update',
+        'destroy' => 'admin.patients.destroy',
+    ]);
+
+    // Routes manajemen appointment
+    Route::resource('appointments', AppointmentController::class)->names([
+        'index' => 'admin.appointments.index',
+        'create' => 'admin.appointments.create',
+        'store' => 'admin.appointments.store',
+        'show' => 'admin.appointments.show',
+        'edit' => 'admin.appointments.edit',
+        'update' => 'admin.appointments.update',
+        'destroy' => 'admin.appointments.destroy',
+    ]);
 });
 
 // Route dokter
@@ -59,6 +85,17 @@ Route::prefix('dokter')->middleware(['auth', \App\Http\Middleware\CheckRole::cla
         'edit' => 'dokter.medical-records.edit',
         'update' => 'dokter.medical-records.update',
         'destroy' => 'dokter.medical-records.destroy',
+    ]);
+
+    // Routes manajemen kunjungan untuk dokter
+    Route::resource('appointments', DokterAppointmentController::class)->only([
+        'index',
+        'show',
+        'update'
+    ])->names([
+        'index' => 'dokter.appointments.index',
+        'show' => 'dokter.appointments.show',
+        'update' => 'dokter.appointments.update',
     ]);
 });
 

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('phone_number')->nullable()->after('photo');
             $table->text('address')->nullable()->after('phone_number');
             $table->integer('age')->nullable()->after('address');
-            $table->enum('gender', ['male', 'female'])->nullable()->after('age');
+            $table->enum('gender', ['laki-laki', 'perempuan'])->nullable()->after('age');
         });
     }
 

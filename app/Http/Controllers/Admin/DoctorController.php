@@ -18,8 +18,40 @@ class DoctorController extends Controller
      */
     public function index()
     {
-        $doctors = Doctor::with('user')->paginate(10);
-        return view('admin.doctors.index', compact('doctors'));
+        if (request()->ajax()) {
+            $doctors = Doctor::with('user')->get();
+
+            return response()->json([
+                'data' => $doctors->map(function ($doctor) {
+                    return [
+                        'id' => $doctor->id,
+                        'name' => $doctor->user->name,
+                        'specialization' => $doctor->specialization,
+                        'license_number' => $doctor->license_number,
+                        'email' => $doctor->user->email,
+                        'phone' => $doctor->user->phone_number,
+                        'status' => $doctor->is_active ? 'Aktif' : 'Tidak Aktif',
+                        'actions' => '
+                            <a href="' . route('admin.doctors.show', $doctor) . '" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="' . route('admin.doctors.edit', $doctor) . '" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form class="d-inline" action="' . route('admin.doctors.destroy', $doctor) . '" method="POST" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus dokter ini?\');">
+                                ' . csrf_field() . '
+                                ' . method_field('DELETE') . '
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        '
+                    ];
+                })
+            ]);
+        }
+
+        return view('admin.doctors.index');
     }
 
     /**
@@ -41,7 +73,7 @@ class DoctorController extends Controller
             'password' => ['required', 'string', 'min:8'],
             'phone_number' => ['required', 'string', 'max:20'],
             'address' => ['required', 'string'],
-            'gender' => ['required', 'in:L,P'],
+            'gender' => ['required', 'in:laki-laki,perempuan'],
             'photo' => ['nullable', 'image', 'max:2048'],
             'specialization' => ['required', 'string', 'max:255'],
             'license_number' => ['required', 'string', 'max:50', 'unique:doctors,license_number'],
@@ -120,7 +152,7 @@ class DoctorController extends Controller
             'password' => ['nullable', 'string', 'min:8'],
             'phone_number' => ['required', 'string', 'max:20'],
             'address' => ['required', 'string'],
-            'gender' => ['required', 'in:L,P'],
+            'gender' => ['required', 'in:laki-laki,perempuan'],
             'photo' => ['nullable', 'image', 'max:2048'],
             'specialization' => ['required', 'string', 'max:255'],
             'license_number' => ['required', 'string', 'max:50', Rule::unique('doctors')->ignore($doctor->id)],

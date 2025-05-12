@@ -100,9 +100,9 @@
                             <tr>
                                 <th>Jenis Kelamin</th>
                                 <td>
-                                    @if ($user->gender === 'male')
+                                    @if ($user->gender === 'laki-laki')
                                         Laki-laki
-                                    @elseif ($user->gender === 'female')
+                                    @elseif ($user->gender === 'perempuan')
                                         Perempuan
                                     @else
                                         -

@@ -12,6 +12,7 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
+        // Buat roles
         $roles = [
             [
                 'name' => 'admin',

@@ -4,45 +4,6 @@
 
 @section('page-title', 'Pasien Dashboard')
 
-@section('sidebar')
-    <li class="nav-item">
-        <a class="nav-link active" href="{{ route('pasien.dashboard') }}">
-            <i class="fas fa-fw fa-tachometer-alt me-2"></i>
-            Dashboard
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-calendar-alt me-2"></i>
-            Jadwal Kunjungan
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-user-md me-2"></i>
-            Dokter
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-clipboard-list me-2"></i>
-            Rekam Medis Saya
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-credit-card me-2"></i>
-            Pembayaran
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-user me-2"></i>
-            Profil Saya
-        </a>
-    </li>
-@endsection
-
 @section('content')
     <div class="row">
         <div class="col-xl-4 col-md-6 mb-4">

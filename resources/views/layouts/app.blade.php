@@ -82,7 +82,13 @@
         </div>
 
         <ul class="nav flex-column">
-            @yield('sidebar')
+            @if (Auth::user()->hasRole('admin'))
+                @include('admin.partials.sidebar')
+            @elseif(Auth::user()->hasRole('dokter'))
+                @include('dokter.partials.sidebar')
+            @elseif(Auth::user()->hasRole('pasien'))
+                @include('pasien.partials.sidebar')
+            @endif
         </ul>
     </div>
 
