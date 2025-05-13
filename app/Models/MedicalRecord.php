@@ -24,6 +24,7 @@ class MedicalRecord extends Model
         'complaint',
         'diagnosis',
         'notes',
+        'status',
     ];
 
     /**
@@ -65,5 +66,13 @@ class MedicalRecord extends Model
     public function prescription(): HasOne
     {
         return $this->hasOne(Prescription::class);
+    }
+
+    /**
+     * Get the invoice for the medical record
+     */
+    public function invoice(): HasOne
+    {
+        return $this->hasOne(TreatmentInvoice::class);
     }
 }

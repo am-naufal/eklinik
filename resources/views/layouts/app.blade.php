@@ -88,6 +88,10 @@
                 @include('dokter.partials.sidebar')
             @elseif(Auth::user()->hasRole('pasien'))
                 @include('pasien.partials.sidebar')
+            @elseif(Auth::user()->hasRole('resepsionis'))
+                @include('resepsionis.partials.sidebar')
+            @elseif(Auth::user()->hasRole('pemilik_klinik'))
+                @include('pemilik.partials.sidebar')
             @endif
         </ul>
     </div>

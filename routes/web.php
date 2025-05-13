@@ -11,8 +11,14 @@ use App\Http\Controllers\Pasien\DashboardController as PasienDashboardController
 use App\Http\Controllers\Admin\PatientController;
 use App\Http\Controllers\Admin\AppointmentController;
 use App\Http\Controllers\Dokter\AppointmentController as DokterAppointmentController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Pemilik\DashboardController as PemilikDashboardController;
+use App\Http\Controllers\Pemilik\ReportController;
+use App\Http\Controllers\Resepsionis\DashboardController as ResepsionisDashboardController;
+use App\Http\Controllers\Resepsionis\PatientController as ResepsionisPatientController;
+use App\Http\Controllers\Resepsionis\AppointmentController as ResepsionisAppointmentController;
+use App\Http\Controllers\Resepsionis\InvoiceController;
 
-Route::auth();
 // Route halaman utama
 Route::get('/', function () {
     return view('welcome');
@@ -22,6 +28,10 @@ Route::get('/', function () {
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// Tambah route register
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);
 
 // Route admin
 Route::prefix('admin')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->group(function () {
@@ -72,6 +82,64 @@ Route::prefix('admin')->middleware(['auth', \App\Http\Middleware\CheckRole::clas
     ]);
 });
 
+// Route pemilik klinik
+Route::prefix('pemilik')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':pemilik_klinik'])->group(function () {
+    Route::get('/dashboard', [PemilikDashboardController::class, 'index'])->name('pemilik.dashboard');
+
+    // Routes manajemen laporan
+    Route::resource('reports', ReportController::class)->names([
+        'index' => 'pemilik.reports.index',
+        'create' => 'pemilik.reports.create',
+        'store' => 'pemilik.reports.store',
+        'show' => 'pemilik.reports.show',
+        'edit' => 'pemilik.reports.edit',
+        'update' => 'pemilik.reports.update',
+        'destroy' => 'pemilik.reports.destroy',
+    ]);
+});
+
+// Route resepsionis
+Route::prefix('resepsionis')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':resepsionis'])->group(function () {
+    Route::get('/dashboard', [ResepsionisDashboardController::class, 'index'])->name('resepsionis.dashboard');
+
+    // Routes manajemen pasien
+    Route::resource('patients', ResepsionisPatientController::class)->names([
+        'index' => 'resepsionis.patients.index',
+        'create' => 'resepsionis.patients.create',
+        'store' => 'resepsionis.patients.store',
+        'show' => 'resepsionis.patients.show',
+        'edit' => 'resepsionis.patients.edit',
+        'update' => 'resepsionis.patients.update',
+        'destroy' => 'resepsionis.patients.destroy',
+    ]);
+    Route::get('/patients/search', [ResepsionisPatientController::class, 'search'])->name('resepsionis.patients.search');
+
+    // Routes manajemen kunjungan
+    Route::resource('appointments', ResepsionisAppointmentController::class)->names([
+        'index' => 'resepsionis.appointments.index',
+        'create' => 'resepsionis.appointments.create',
+        'store' => 'resepsionis.appointments.store',
+        'show' => 'resepsionis.appointments.show',
+        'edit' => 'resepsionis.appointments.edit',
+        'update' => 'resepsionis.appointments.update',
+        'destroy' => 'resepsionis.appointments.destroy',
+    ]);
+    Route::get('/check-availability', [ResepsionisAppointmentController::class, 'checkAvailability'])->name('resepsionis.appointments.check-availability');
+
+    // Routes manajemen nota penanganan
+    Route::resource('invoices', InvoiceController::class)->names([
+        'index' => 'resepsionis.invoices.index',
+        'create' => 'resepsionis.invoices.create',
+        'store' => 'resepsionis.invoices.store',
+        'show' => 'resepsionis.invoices.show',
+        'edit' => 'resepsionis.invoices.edit',
+        'update' => 'resepsionis.invoices.update',
+        'destroy' => 'resepsionis.invoices.destroy',
+    ]);
+    Route::get('/invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('resepsionis.invoices.print');
+    Route::put('/invoices/{invoice}/mark-as-paid', [InvoiceController::class, 'markAsPaid'])->name('resepsionis.invoices.mark-as-paid');
+});
+
 // Route dokter
 Route::prefix('dokter')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':dokter'])->group(function () {
     Route::get('/dashboard', [DokterDashboardController::class, 'index'])->name('dokter.dashboard');
@@ -102,6 +170,13 @@ Route::prefix('dokter')->middleware(['auth', \App\Http\Middleware\CheckRole::cla
 // Route pasien
 Route::prefix('pasien')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':pasien'])->group(function () {
     Route::get('/dashboard', [PasienDashboardController::class, 'index'])->name('pasien.dashboard');
+
+    // Routes jadwal kunjungan untuk pasien
+    Route::get('/jadwal', [App\Http\Controllers\Pasien\AppointmentController::class, 'index'])->name('pasien.appointments.index');
+    Route::get('/jadwal/tambah', [App\Http\Controllers\Pasien\AppointmentController::class, 'create'])->name('pasien.appointments.create');
+    Route::post('/jadwal', [App\Http\Controllers\Pasien\AppointmentController::class, 'store'])->name('pasien.appointments.store');
+    Route::get('/jadwal/{appointment}', [App\Http\Controllers\Pasien\AppointmentController::class, 'show'])->name('pasien.appointments.show');
+    Route::put('/jadwal/{appointment}/cancel', [App\Http\Controllers\Pasien\AppointmentController::class, 'cancel'])->name('pasien.appointments.cancel');
 });
 
 

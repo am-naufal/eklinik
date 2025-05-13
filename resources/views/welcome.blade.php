@@ -539,7 +539,15 @@
                 <div class="auth-buttons">
                     @if (Route::has('login'))
                         @auth
-                            <a href="{{ url('/admin/dashboard') }}" class="btn btn-primary">Dashboard</a>
+                            @if (Auth::user()->hasRole('dokter'))
+                                <a href="{{ route('dokter.dashboard') }}" class="btn btn-primary">Dashboard</a>
+                            @elseif (Auth::user()->hasRole('pasien'))
+                                <a href="{{ route('pasien.dashboard') }}" class="btn btn-primary">Dashboard</a>
+                            @elseif (Auth::user()->hasRole('resepsionis'))
+                                <a href="{{ route('resepsionis.dashboard') }}" class="btn btn-primary">Dashboard</a>
+                            @else
+                                <a href="{{ route('admin.dashboard') }}" class="btn btn-primary">Dashboard</a>
+                            @endif
                         @else
                             <a href="{{ route('login') }}" class="btn btn-outline">Masuk</a>
                             @if (Route::has('register'))

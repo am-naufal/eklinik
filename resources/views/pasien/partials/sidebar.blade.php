@@ -5,7 +5,8 @@
     </a>
 </li>
 <li class="nav-item">
-    <a class="nav-link {{ Request::is('pasien/jadwal*') ? 'active' : '' }}" href="#">
+    <a class="nav-link {{ Request::is('pasien/jadwal*') ? 'active' : '' }}"
+        href="{{ route('pasien.appointments.index') }}">
         <i class="fas fa-fw fa-calendar-alt me-2"></i>
         Jadwal Kunjungan
     </a>

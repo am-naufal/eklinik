@@ -26,6 +26,14 @@ class RoleSeeder extends Seeder
                 'name' => 'pasien',
                 'description' => 'Pasien dengan akses terbatas'
             ],
+            [
+                'name' => 'pemilik_klinik',
+                'description' => 'Pemilik klinik dengan akses ke laporan'
+            ],
+            [
+                'name' => 'resepsionis',
+                'description' => 'Resepsionis yang menangani pasien dan administrasi'
+            ],
         ];
 
         foreach ($roles as $role) {
