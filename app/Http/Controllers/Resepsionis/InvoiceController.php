@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Resepsionis;
 use App\Http\Controllers\Controller;
 use App\Models\MedicalRecord;
 use App\Models\TreatmentInvoice;
+use App\Models\InvoiceItem;
+use App\Models\Medicine;
 use App\Models\Patient;
 use App\Models\Doctor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class InvoiceController extends Controller
@@ -45,8 +48,9 @@ class InvoiceController extends Controller
 
         $patients = Patient::with('user')->get();
         $doctors = Doctor::with('user')->get();
+        $medicines = Medicine::where('stock', '>', 0)->orderBy('name')->get();
 
-        return view('resepsionis.invoices.create', compact('medicalRecords', 'patients', 'doctors'));
+        return view('resepsionis.invoices.create', compact('medicalRecords', 'patients', 'doctors', 'medicines'));
     }
 
     /**
@@ -61,6 +65,12 @@ class InvoiceController extends Controller
             'total_amount' => 'required|numeric|min:0',
             'notes' => 'nullable|string',
             'payment_status' => 'required|in:pending,paid,cancelled',
+            'medicine_id' => 'nullable|array',
+            'medicine_id.*' => 'exists:medicines,id',
+            'quantity' => 'nullable|array',
+            'quantity.*' => 'integer|min:1',
+            'medicine_price' => 'nullable|array',
+            'medicine_price.*' => 'numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -77,29 +87,81 @@ class InvoiceController extends Controller
                 ->withInput();
         }
 
-        // Generate invoice number
-        $invoiceNumber = TreatmentInvoice::generateInvoiceNumber();
+        DB::beginTransaction();
 
-        // Atur paid_at jika status 'paid'
-        $paidAt = null;
-        if ($request->payment_status === 'paid') {
-            $paidAt = Carbon::now();
+        try {
+            // Generate invoice number
+            $invoiceNumber = TreatmentInvoice::generateInvoiceNumber();
+
+            // Atur paid_at jika status 'paid'
+            $paidAt = null;
+            if ($request->payment_status === 'paid') {
+                $paidAt = Carbon::now();
+            }
+
+            // Hitung total biaya obat
+            $medicineTotalAmount = 0;
+            if ($request->has('medicine_id')) {
+                foreach ($request->medicine_id as $index => $medicineId) {
+                    if (isset($request->quantity[$index]) && isset($request->medicine_price[$index])) {
+                        $quantity = (int) $request->quantity[$index];
+                        $price = (float) $request->medicine_price[$index];
+                        $medicineTotalAmount += $quantity * $price;
+                    }
+                }
+            }
+
+            // Buat invoice
+            $invoice = TreatmentInvoice::create([
+                'medical_record_id' => $request->medical_record_id,
+                'patient_id' => $request->patient_id,
+                'doctor_id' => $request->doctor_id,
+                'created_by' => Auth::id(),
+                'invoice_number' => $invoiceNumber,
+                'total_amount' => $request->total_amount + $medicineTotalAmount,
+                'notes' => $request->notes,
+                'payment_status' => $request->payment_status,
+                'paid_at' => $paidAt,
+            ]);
+
+            // Simpan item obat
+            if ($request->has('medicine_id')) {
+                foreach ($request->medicine_id as $index => $medicineId) {
+                    if (isset($request->quantity[$index]) && isset($request->medicine_price[$index])) {
+                        $medicine = Medicine::find($medicineId);
+                        if ($medicine) {
+                            $quantity = (int) $request->quantity[$index];
+                            $price = (float) $request->medicine_price[$index];
+                            $subtotal = $quantity * $price;
+
+                            // Buat item invoice
+                            InvoiceItem::create([
+                                'treatment_invoice_id' => $invoice->id,
+                                'medicine_id' => $medicineId,
+                                'quantity' => $quantity,
+                                'price' => $price,
+                                'subtotal' => $subtotal,
+                                'notes' => $request->medicine_notes[$index] ?? null
+                            ]);
+
+                            // Kurangi stok obat
+                            $medicine->stock -= $quantity;
+                            $medicine->save();
+                        }
+                    }
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('resepsionis.invoices.index')
+                ->with('success', 'Nota penanganan berhasil dibuat');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                ->withInput();
         }
-
-        TreatmentInvoice::create([
-            'medical_record_id' => $request->medical_record_id,
-            'patient_id' => $request->patient_id,
-            'doctor_id' => $request->doctor_id,
-            'created_by' => Auth::id(),
-            'invoice_number' => $invoiceNumber,
-            'total_amount' => $request->total_amount,
-            'notes' => $request->notes,
-            'payment_status' => $request->payment_status,
-            'paid_at' => $paidAt,
-        ]);
-
-        return redirect()->route('resepsionis.invoices.index')
-            ->with('success', 'Nota penanganan berhasil dibuat');
     }
 
     /**
@@ -107,7 +169,14 @@ class InvoiceController extends Controller
      */
     public function show(string $id)
     {
-        $invoice = TreatmentInvoice::with(['patient.user', 'doctor.user', 'medicalRecord', 'creator'])->findOrFail($id);
+        $invoice = TreatmentInvoice::with([
+            'patient.user',
+            'doctor.user',
+            'medicalRecord',
+            'creator',
+            'items.medicine'
+        ])->findOrFail($id);
+
         return view('resepsionis.invoices.show', compact('invoice'));
     }
 
@@ -116,11 +185,18 @@ class InvoiceController extends Controller
      */
     public function edit(string $id)
     {
-        $invoice = TreatmentInvoice::with(['patient.user', 'doctor.user', 'medicalRecord'])->findOrFail($id);
+        $invoice = TreatmentInvoice::with([
+            'patient.user',
+            'doctor.user',
+            'medicalRecord',
+            'items.medicine'
+        ])->findOrFail($id);
+
         $patients = Patient::with('user')->get();
         $doctors = Doctor::with('user')->get();
+        $medicines = Medicine::where('stock', '>', 0)->orderBy('name')->get();
 
-        return view('resepsionis.invoices.edit', compact('invoice', 'patients', 'doctors'));
+        return view('resepsionis.invoices.edit', compact('invoice', 'patients', 'doctors', 'medicines'));
     }
 
     /**
@@ -134,6 +210,12 @@ class InvoiceController extends Controller
             'total_amount' => 'required|numeric|min:0',
             'notes' => 'nullable|string',
             'payment_status' => 'required|in:pending,paid,cancelled',
+            'medicine_id' => 'nullable|array',
+            'medicine_id.*' => 'exists:medicines,id',
+            'quantity' => 'nullable|array',
+            'quantity.*' => 'integer|min:1',
+            'medicine_price' => 'nullable|array',
+            'medicine_price.*' => 'numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -142,23 +224,87 @@ class InvoiceController extends Controller
                 ->withInput();
         }
 
-        // Update paid_at jika status pembayaran berubah menjadi 'paid'
-        $paidAt = $invoice->paid_at;
-        if ($request->payment_status === 'paid' && $invoice->payment_status !== 'paid') {
-            $paidAt = Carbon::now();
-        } elseif ($request->payment_status !== 'paid') {
-            $paidAt = null;
+        DB::beginTransaction();
+
+        try {
+            // Update paid_at jika status pembayaran berubah menjadi 'paid'
+            $paidAt = $invoice->paid_at;
+            if ($request->payment_status === 'paid' && $invoice->payment_status !== 'paid') {
+                $paidAt = Carbon::now();
+            } elseif ($request->payment_status !== 'paid') {
+                $paidAt = null;
+            }
+
+            // Kembalikan stok obat untuk item yang ada sebelumnya
+            foreach ($invoice->items as $item) {
+                $medicine = $item->medicine;
+                if ($medicine) {
+                    $medicine->stock += $item->quantity;
+                    $medicine->save();
+                }
+            }
+
+            // Hapus semua item lama
+            $invoice->items()->delete();
+
+            // Hitung total biaya obat
+            $medicineTotalAmount = 0;
+            if ($request->has('medicine_id')) {
+                foreach ($request->medicine_id as $index => $medicineId) {
+                    if (isset($request->quantity[$index]) && isset($request->medicine_price[$index])) {
+                        $quantity = (int) $request->quantity[$index];
+                        $price = (float) $request->medicine_price[$index];
+                        $medicineTotalAmount += $quantity * $price;
+                    }
+                }
+            }
+
+            // Update invoice
+            $invoice->update([
+                'total_amount' => $request->total_amount + $medicineTotalAmount,
+                'notes' => $request->notes,
+                'payment_status' => $request->payment_status,
+                'paid_at' => $paidAt,
+            ]);
+
+            // Simpan item obat baru
+            if ($request->has('medicine_id')) {
+                foreach ($request->medicine_id as $index => $medicineId) {
+                    if (isset($request->quantity[$index]) && isset($request->medicine_price[$index])) {
+                        $medicine = Medicine::find($medicineId);
+                        if ($medicine) {
+                            $quantity = (int) $request->quantity[$index];
+                            $price = (float) $request->medicine_price[$index];
+                            $subtotal = $quantity * $price;
+
+                            // Buat item invoice
+                            InvoiceItem::create([
+                                'treatment_invoice_id' => $invoice->id,
+                                'medicine_id' => $medicineId,
+                                'quantity' => $quantity,
+                                'price' => $price,
+                                'subtotal' => $subtotal,
+                                'notes' => $request->medicine_notes[$index] ?? null
+                            ]);
+
+                            // Kurangi stok obat
+                            $medicine->stock -= $quantity;
+                            $medicine->save();
+                        }
+                    }
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('resepsionis.invoices.index')
+                ->with('success', 'Nota penanganan berhasil diperbarui');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                ->withInput();
         }
-
-        $invoice->update([
-            'total_amount' => $request->total_amount,
-            'notes' => $request->notes,
-            'payment_status' => $request->payment_status,
-            'paid_at' => $paidAt,
-        ]);
-
-        return redirect()->route('resepsionis.invoices.index')
-            ->with('success', 'Nota penanganan berhasil diperbarui');
     }
 
     /**
@@ -167,14 +313,30 @@ class InvoiceController extends Controller
     public function destroy(string $id)
     {
         try {
-            $invoice = TreatmentInvoice::findOrFail($id);
+            $invoice = TreatmentInvoice::with('items.medicine')->findOrFail($id);
+
+            DB::beginTransaction();
+
+            // Kembalikan stok obat untuk semua item
+            foreach ($invoice->items as $item) {
+                $medicine = $item->medicine;
+                if ($medicine) {
+                    $medicine->stock += $item->quantity;
+                    $medicine->save();
+                }
+            }
+
+            // Hapus invoice dan semua itemnya (cascade)
             $invoice->delete();
+
+            DB::commit();
 
             return redirect()->route('resepsionis.invoices.index')
                 ->with('success', 'Nota penanganan berhasil dihapus');
         } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->route('resepsionis.invoices.index')
-                ->with('error', 'Nota penanganan tidak dapat dihapus');
+                ->with('error', 'Nota penanganan tidak dapat dihapus: ' . $e->getMessage());
         }
     }
 
@@ -183,7 +345,14 @@ class InvoiceController extends Controller
      */
     public function print(string $id)
     {
-        $invoice = TreatmentInvoice::with(['patient.user', 'doctor.user', 'medicalRecord', 'creator'])->findOrFail($id);
+        $invoice = TreatmentInvoice::with([
+            'patient.user',
+            'doctor.user',
+            'medicalRecord',
+            'creator',
+            'items.medicine'
+        ])->findOrFail($id);
+
         return view('resepsionis.invoices.print', compact('invoice'));
     }
 
