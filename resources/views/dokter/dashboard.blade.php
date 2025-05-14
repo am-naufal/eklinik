@@ -84,10 +84,12 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
+                        @if($todayAppointments->count() > 0)
                         <table class="table table-bordered" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
                                     <th>Waktu</th>
+                                   
                                     <th>Nama Pasien</th>
                                     <th>Keluhan</th>
                                     <th>Status</th>
@@ -95,36 +97,67 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @foreach($todayAppointments as $appointment)
+                        
                                 <tr>
-                                    <td>08:00</td>
-                                    <td>Siti Rahayu</td>
-                                    <td>Demam, Batuk</td>
-                                    <td><span class="badge bg-success">Selesai</span></td>
-                                    <td><a href="#" class="btn btn-sm btn-primary">Detail</a></td>
+                                    <td>{{ \Carbon\Carbon::parse($appointment->appointment_time)->format('H:i') }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <div class="font-weight-bold">{{ $appointment->patient->user->name}}</div>
+                                                <small class="text-muted">{{ $appointment->patient->medical_record_number }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ $appointment->reason }}</td>
+                                    <td>
+                                        @switch($appointment->status)
+                                            @case('Selesai')
+                                                <span class="badge bg-success">Selesai</span>
+                                                @break
+                                            @case('Menunggu')
+                                                <span class="badge bg-warning">Menunggu</span>
+                                                @break
+                                            @case('Dibatalkan')
+                                                <span class="badge bg-danger">Dibatalkan</span>
+                                                @break
+                                            @default
+                                                <span class="badge bg-primary">Dijadwalkan</span>
+                                        @endswitch
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            @if($appointment->status == 'Selesai')
+                                                <a href="{{ route('doctor.medical-records.show', $appointment->medical_record_id) }}" 
+                                                   class="btn btn-sm btn-primary" 
+                                                   data-toggle="tooltip" 
+                                                   title="Lihat Rekam Medis">
+                                                    <i class="fas fa-file-medical"></i> Detail
+                                                </a>
+                                            @elseif($appointment->status == 'Menunggu')
+                                                <a href="{{ route('doctor.appointments.examine', $appointment->id) }}" 
+                                                   class="btn btn-sm btn-primary"
+                                                   data-toggle="tooltip" 
+                                                   title="Mulai Pemeriksaan">
+                                                    <i class="fas fa-stethoscope"></i> Periksa
+                                                </a>
+                                            @else
+                                                <button class="btn btn-sm btn-secondary" disabled>
+                                                    <i class="fas fa-clock"></i> Belum Waktunya
+                                                </button>
+                                            @endif
+                                        </div>
+                                    </td>
                                 </tr>
-                                <tr>
-                                    <td>09:30</td>
-                                    <td>Budi Hartono</td>
-                                    <td>Sakit Kepala</td>
-                                    <td><span class="badge bg-success">Selesai</span></td>
-                                    <td><a href="#" class="btn btn-sm btn-primary">Detail</a></td>
-                                </tr>
-                                <tr>
-                                    <td>11:00</td>
-                                    <td>Dewi Lestari</td>
-                                    <td>Konsultasi Gizi</td>
-                                    <td><span class="badge bg-warning">Menunggu</span></td>
-                                    <td><a href="#" class="btn btn-sm btn-primary">Panggil</a></td>
-                                </tr>
-                                <tr>
-                                    <td>13:30</td>
-                                    <td>Rudi Hermawan</td>
-                                    <td>Cek Tekanan Darah</td>
-                                    <td><span class="badge bg-primary">Terjadwal</span></td>
-                                    <td><a href="#" class="btn btn-sm btn-secondary">Belum Waktunya</a></td>
-                                </tr>
+                                @endforeach
                             </tbody>
                         </table>
+                        @else
+                        <div class="text-center py-4">
+                            <i class="fas fa-calendar-times fa-3x text-gray-300 mb-3"></i>
+                            <p class="text-gray-500 mb-0">Tidak ada jadwal kunjungan untuk hari ini</p>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
