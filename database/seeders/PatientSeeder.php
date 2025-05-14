@@ -105,6 +105,7 @@ class PatientSeeder extends Seeder
                 'name' => $patientData['name'],
                 'email' => $patientData['email'],
                 'password' => Hash::make($patientData['password']),
+                'phone_number' => $patientData['phone_number'],
                 'role_id' => $patientData['role_id'],
             ]);
 
@@ -116,7 +117,6 @@ class PatientSeeder extends Seeder
                 'gender' => $patientData['gender'],
                 'blood_type' => $patientData['blood_type'],
                 'address' => $patientData['address'],
-                'phone_number' => $patientData['phone_number'],
                 'emergency_contact' => $patientData['emergency_contact'],
                 'emergency_phone' => $patientData['emergency_phone'],
                 'insurance_number' => $patientData['insurance_number'],

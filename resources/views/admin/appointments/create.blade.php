@@ -26,13 +26,14 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="patient_id">Pasien <span class="text-danger">*</span></label>
-                                <select class="form-control @error('patient_id') is-invalid @enderror" id="patient_id"
+                                <select class="form-control select2-patient @error('patient_id') is-invalid @enderror" id="patient_id"
                                     name="patient_id" required>
                                     <option value="">-- Pilih Pasien --</option>
                                     @foreach ($patients as $patient)
                                         <option value="{{ $patient->id }}"
-                                            {{ old('patient_id') == $patient->id ? 'selected' : '' }}>
-                                            {{ $patient->user->name }} - {{ $patient->no_rekam_medis }}
+                                            {{ old('patient_id') == $patient->id ? 'selected' : '' }}
+                                            data-phone="{{ $patient->user->phone }}">
+                                            {{ $patient->user->name }} - {{ $patient->user->phone }} - {{ $patient->no_rekam_medis }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -47,7 +48,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="doctor_id">Dokter <span class="text-danger">*</span></label>
-                                <select class="form-control @error('doctor_id') is-invalid @enderror" id="doctor_id"
+                                <select class="form-control select2-doctor @error('doctor_id') is-invalid @enderror" id="doctor_id"
                                     name="doctor_id" required>
                                     <option value="">-- Pilih Dokter --</option>
                                     @foreach ($doctors as $doctor)
@@ -155,15 +156,57 @@
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
     <script>
         $(document).ready(function() {
-            // Inisialisasi select2 untuk dropdown pasien dan dokter
-            $('#patient_id, #doctor_id').select2({
+            // Inisialisasi Select2 untuk pasien
+            $('.select2-patient').select2({
                 theme: 'bootstrap4',
-                placeholder: "Pilih...",
-                allowClear: true
+                placeholder: 'Cari pasien berdasarkan nama atau nomor HP...',
+                allowClear: true,
+                width: '100%',
+                language: {
+                    noResults: function() {
+                        return "Pasien tidak ditemukan";
+                    },
+                    searching: function() {
+                        return "Mencari...";
+                    }
+                },
+                matcher: function(params, data) {
+                    // Jika tidak ada pencarian
+                    if ($.trim(params.term) === '') {
+                        return data;
+                    }
+
+                    // Cari berdasarkan nama atau nomor HP
+                    var searchStr = data.text.toLowerCase();
+                    var searchTerm = params.term.toLowerCase();
+
+                    if (searchStr.indexOf(searchTerm) > -1) {
+                        return data;
+                    }
+
+                    // Jika tidak ditemukan
+                    return null;
+                }
+            });
+
+            // Inisialisasi Select2 untuk dokter
+            $('.select2-doctor').select2({
+                theme: 'bootstrap4',
+                placeholder: 'Cari dokter berdasarkan nama atau spesialisasi...',
+                allowClear: true,
+                width: '100%',
+                language: {
+                    noResults: function() {
+                        return "Dokter tidak ditemukan";
+                    },
+                    searching: function() {
+                        return "Mencari...";
+                    }
+                }
             });
         });
     </script>
-@endsection
+@endpush
