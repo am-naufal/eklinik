@@ -22,6 +22,12 @@
         Pasien
     </a>
 </li>
+<li class="nav-item {{ Request::is('admin/medicines*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ route('admin.medicines.index') }}">
+        <i class="fas fa-fw fa-pills me-2"></i>
+        Manajemen Obat
+    </a>
+</li>
 <li class="nav-item">
     <a class="nav-link {{ Request::is('admin/appointments*') ? 'active' : '' }}"
         href="{{ route('admin.appointments.index') }}">

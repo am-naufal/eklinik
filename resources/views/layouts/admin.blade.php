@@ -103,6 +103,14 @@
                 </a>
             </li>
 
+            <!-- Nav Item - Medicines Menu -->
+            <li class="nav-item {{ Request::is('admin/medicines*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.medicines.index') }}">
+                    <i class="fas fa-fw fa-pills me-2"></i>
+                    Manajemen Obat
+                </a>
+            </li>
+
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
 

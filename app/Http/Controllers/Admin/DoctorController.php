@@ -18,40 +18,19 @@ class DoctorController extends Controller
      */
     public function index()
     {
-        if (request()->ajax()) {
-            $doctors = Doctor::with('user')->get();
+        $doctors = Doctor::with('user')->get()->map(function ($doctor) {
+            return (object)[
+                'id' => $doctor->id,
+                'name' => $doctor->user->name,
+                'specialization' => $doctor->specialization,
+                'license_number' => $doctor->license_number,
+                'email' => $doctor->user->email,
+                'phone' => $doctor->user->phone_number,
+                'is_active' => $doctor->is_active
+            ];
+        });
 
-            return response()->json([
-                'data' => $doctors->map(function ($doctor) {
-                    return [
-                        'id' => $doctor->id,
-                        'name' => $doctor->user->name,
-                        'specialization' => $doctor->specialization,
-                        'license_number' => $doctor->license_number,
-                        'email' => $doctor->user->email,
-                        'phone' => $doctor->user->phone_number,
-                        'status' => $doctor->is_active ? 'Aktif' : 'Tidak Aktif',
-                        'actions' => '
-                            <a href="' . route('admin.doctors.show', $doctor) . '" class="btn btn-sm btn-info">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a href="' . route('admin.doctors.edit', $doctor) . '" class="btn btn-sm btn-primary">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form class="d-inline" action="' . route('admin.doctors.destroy', $doctor) . '" method="POST" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus dokter ini?\');">
-                                ' . csrf_field() . '
-                                ' . method_field('DELETE') . '
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        '
-                    ];
-                })
-            ]);
-        }
-
-        return view('admin.doctors.index');
+        return view('admin.doctors.index', compact('doctors'));
     }
 
     /**

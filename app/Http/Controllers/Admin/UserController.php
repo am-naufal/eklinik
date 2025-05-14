@@ -18,39 +18,18 @@ class UserController extends Controller
      */
     public function index()
     {
-        if (request()->ajax()) {
-            $users = User::with('role')->get();
+        $users = User::with('role')->get()->map(function ($user) {
+            return (object)[
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role ? $user->role->name : '-',
+                'phone' => $user->phone_number ?? '-',
+                'gender' => $user->gender ?? '-',
+            ];
+        });
 
-            return response()->json([
-                'data' => $users->map(function ($user) {
-                    return [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'role' => $user->role ? $user->role->name : '-',
-                        'phone' => $user->phone_number ?? '-',
-                        'gender' => $user->gender ?? '-',
-                        'actions' => '
-                            <a href="' . route('admin.users.show', $user) . '" class="btn btn-sm btn-info">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a href="' . route('admin.users.edit', $user) . '" class="btn btn-sm btn-primary">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form class="d-inline" action="' . route('admin.users.destroy', $user) . '" method="POST" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus user ini?\');">
-                                ' . csrf_field() . '
-                                ' . method_field('DELETE') . '
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        '
-                    ];
-                })
-            ]);
-        }
-
-        return view('admin.users.index');
+        return view('admin.users.index', compact('users'));
     }
 
     /**

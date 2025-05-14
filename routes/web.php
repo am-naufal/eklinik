@@ -10,6 +10,7 @@ use App\Http\Controllers\Dokter\MedicalRecordController;
 use App\Http\Controllers\Pasien\DashboardController as PasienDashboardController;
 use App\Http\Controllers\Admin\PatientController;
 use App\Http\Controllers\Admin\AppointmentController;
+use App\Http\Controllers\Admin\MedicineController;
 use App\Http\Controllers\Dokter\AppointmentController as DokterAppointmentController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Pemilik\DashboardController as PemilikDashboardController;
@@ -80,6 +81,18 @@ Route::prefix('admin')->middleware(['auth', \App\Http\Middleware\CheckRole::clas
         'update' => 'admin.appointments.update',
         'destroy' => 'admin.appointments.destroy',
     ]);
+
+    // Routes manajemen obat
+    Route::resource('medicines', MedicineController::class)->names([
+        'index' => 'admin.medicines.index',
+        'create' => 'admin.medicines.create',
+        'store' => 'admin.medicines.store',
+        'show' => 'admin.medicines.show',
+        'edit' => 'admin.medicines.edit',
+        'update' => 'admin.medicines.update',
+        'destroy' => 'admin.medicines.destroy',
+    ]);
+    Route::post('/medicines/{medicine}/update-stock', [MedicineController::class, 'updateStock'])->name('admin.medicines.update-stock');
 });
 
 // Route pemilik klinik

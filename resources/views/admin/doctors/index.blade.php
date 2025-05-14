@@ -9,51 +9,12 @@
 
 @section('page-title', 'Manajemen Dokter')
 
-@section('sidebar')
-    <li class="nav-item">
-        <a class="nav-link" href="{{ route('admin.dashboard') }}">
-            <i class="fas fa-fw fa-tachometer-alt me-2"></i>
-            Dashboard
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="{{ route('admin.users.index') }}">
-            <i class="fas fa-fw fa-users me-2"></i>
-            Manajemen User
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link active" href="{{ route('admin.doctors.index') }}">
-            <i class="fas fa-fw fa-user-md me-2"></i>
-            Dokter
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-procedures me-2"></i>
-            Pasien
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-calendar-check me-2"></i>
-            Jadwal
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-cog me-2"></i>
-            Pengaturan
-        </a>
-    </li>
-@endsection
-
 @section('content')
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">Daftar Dokter</h6>
-            <a href="{{ route('admin.doctors.create') }}" class="btn btn-sm btn-primary">
-                <i class="fas fa-plus me-1"></i> Tambah Dokter
+            <a href="{{ route('admin.doctors.create') }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Tambah Dokter
             </a>
         </div>
         <div class="card-body">
@@ -72,10 +33,10 @@
             @endif
 
             <div class="table-responsive">
-                <table class="table table-bordered" id="doctors-table" width="100%" cellspacing="0">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>No.</th>
                             <th>Nama</th>
                             <th>Spesialisasi</th>
                             <th>No. SIP</th>
@@ -86,14 +47,53 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @foreach ($doctors as $doctor)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $doctor->name }}</td>
+                                <td>{{ $doctor->specialization }}</td>
+                                <td>{{ $doctor->license_number }}</td>
+                                <td>{{ $doctor->email }}</td>
+                                <td>{{ $doctor->phone }}</td>
+                                <td>
+                                    @if ($doctor->is_active)
+                                        <span class="badge bg-success">Aktif</span>
+                                    @else
+                                        <span class="badge bg-danger">Non-Aktif</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ route('admin.doctors.show', $doctor->id) }}"
+                                            class="btn btn-info btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('admin.doctors.edit', $doctor->id) }}"
+                                            class="btn btn-warning btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('admin.doctors.destroy', $doctor->id) }}" method="POST"
+                                            class="d-inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Apakah Anda yakin ingin menghapus dokter ini?')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
+
         </div>
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
@@ -108,53 +108,29 @@
 
     <script>
         $(document).ready(function() {
-            $('#doctors-table').DataTable({
-                processing: true,
-                serverSide: false,
-                ajax: "{{ route('admin.doctors.index') }}",
-                columns: [{
-                        data: 'id',
-                        name: 'id'
-                    },
-                    {
-                        data: 'name',
-                        name: 'name'
-                    },
-                    {
-                        data: 'specialization',
-                        name: 'specialization'
-                    },
-                    {
-                        data: 'license_number',
-                        name: 'license_number'
-                    },
-                    {
-                        data: 'email',
-                        name: 'email'
-                    },
-                    {
-                        data: 'phone',
-                        name: 'phone'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status'
-                    },
-                    {
-                        data: 'actions',
-                        name: 'actions',
-                        orderable: false,
-                        searchable: false
-                    }
-                ],
+            $('#dataTable').DataTable({
+                // Aktifkan tombol export dan fitur lainnya
                 dom: 'Bfrtip',
                 buttons: [
-                    'copy', 'csv', 'excel', 'pdf', 'print', 'colvis'
+                    'copy', 'csv', 'excel', 'pdf', 'print',
                 ],
+                ordering: true,
+                responsive: true,
                 language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/id.json',
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ entri",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                    infoEmpty: "Tidak ada data tersedia",
+                    infoFiltered: "(difilter dari _MAX_ total entri)",
+                    zeroRecords: "Tidak ditemukan data ",
+                    paginate: {
+                        first: "Pertama",
+                        last: "Terakhir",
+                        next: "Berikutnya",
+                        previous: "Sebelumnya"
+                    }
                 }
             });
         });
     </script>
-@endsection
+@endpush
