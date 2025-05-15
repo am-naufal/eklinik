@@ -178,6 +178,8 @@ Route::prefix('dokter')->middleware(['auth', \App\Http\Middleware\CheckRole::cla
         'show' => 'dokter.appointments.show',
         'update' => 'dokter.appointments.update',
     ]);
+    // Tambahkan rute khusus untuk pemeriksaan pasien
+    Route::get('/appointments/{appointment}/examine', [DokterAppointmentController::class, 'examine'])->name('dokter.appointments.examine');
 });
 
 // Route pasien

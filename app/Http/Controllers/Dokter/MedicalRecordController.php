@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class MedicalRecordController extends Controller
 {
@@ -163,6 +164,13 @@ class MedicalRecordController extends Controller
         }
 
         $medicalRecord->load(['patient', 'doctor.user', 'treatments', 'prescription.prescriptionItems.medicine']);
+
+        // Debugging - melihat struktur data pasien
+        \Log::info('Patient data structure:', [
+            'patient' => $medicalRecord->patient,
+            'patient_class' => get_class($medicalRecord->patient),
+            'patient_attributes' => $medicalRecord->patient->getAttributes()
+        ]);
 
         return view('dokter.medical_records.show', compact('medicalRecord'));
     }
