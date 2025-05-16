@@ -13,7 +13,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Total Dokter</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">10</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalDoctors }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-user-md fa-2x text-gray-300"></i>
@@ -30,7 +30,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Total Pasien</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">215</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalPatients }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-procedures fa-2x text-gray-300"></i>
@@ -48,7 +48,7 @@
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 Appointment Hari Ini
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $todayAppointments }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-calendar-check fa-2x text-gray-300"></i>
@@ -65,7 +65,8 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 Pendapatan Bulan Ini</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">Rp 25.000.000</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Rp
+                                {{ number_format($currentMonthIncome, 0, ',', '.') }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
@@ -94,30 +95,29 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>Ahmad Gunawan</td>
-                                    <td>dr. Budi Santoso</td>
-                                    <td>2023-06-15 09:00</td>
-                                    <td><span class="badge bg-success">Selesai</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Siti Rahayu</td>
-                                    <td>dr. Diana Putri</td>
-                                    <td>2023-06-15 10:30</td>
-                                    <td><span class="badge bg-warning">Menunggu</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Rudi Hermawan</td>
-                                    <td>dr. Eko Prasetyo</td>
-                                    <td>2023-06-15 13:15</td>
-                                    <td><span class="badge bg-primary">Dijadwalkan</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Dewi Lestari</td>
-                                    <td>dr. Farida Amir</td>
-                                    <td>2023-06-15 15:45</td>
-                                    <td><span class="badge bg-primary">Dijadwalkan</span></td>
-                                </tr>
+                                @forelse ($latestAppointments as $appointment)
+                                    <tr>
+                                        <td>{{ $appointment->patient->user->name }}</td>
+                                        <td>{{ $appointment->doctor->user->name }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d H:i') }}
+                                        </td>
+                                        <td>
+                                            @if ($appointment->status == 'completed')
+                                                <span class="badge bg-success">Selesai</span>
+                                            @elseif ($appointment->status == 'waiting')
+                                                <span class="badge bg-warning">Menunggu</span>
+                                            @elseif ($appointment->status == 'scheduled')
+                                                <span class="badge bg-primary">Dijadwalkan</span>
+                                            @else
+                                                <span class="badge bg-secondary">{{ $appointment->status }}</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center">Tidak ada appointment terbaru</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -127,39 +127,42 @@
 
         <div class="col-lg-6">
             <div class="card shadow mb-4">
-                <div class="card-header py-3">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">Aktivitas Terbaru</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                            aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Opsi:</div>
+                            <a class="dropdown-item" href="{{ route('admin.appointments.index') }}">Lihat Semua
+                                Appointment</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{ route('admin.medicines.index') }}">Kelola Obat</a>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="list-group">
                         <a href="#" class="list-group-item list-group-item-action">
                             <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Pasien baru terdaftar</h6>
-                                <small>3 jam yang lalu</small>
+                                <h6 class="mb-1">Stok Obat Menipis</h6>
+                                <small>Terbaru</small>
                             </div>
-                            <p class="mb-1">Dewi Lestari telah mendaftar sebagai pasien baru.</p>
+                            <p class="mb-1">{{ $lowStockMedicines }} item obat telah mencapai batas minimum stok.</p>
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Pembayaran diterima</h6>
-                                <small>5 jam yang lalu</small>
-                            </div>
-                            <p class="mb-1">Pembayaran dari Ahmad Gunawan sebesar Rp 500.000 telah diterima.</p>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Jadwal dokter diperbarui</h6>
-                                <small>1 hari yang lalu</small>
-                            </div>
-                            <p class="mb-1">dr. Budi Santoso telah memperbarui jadwal praktiknya.</p>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Stok obat menipis</h6>
-                                <small>2 hari yang lalu</small>
-                            </div>
-                            <p class="mb-1">Beberapa item obat telah mencapai batas minimum stok.</p>
-                        </a>
+                        @foreach ($latestAppointments as $appointment)
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">Appointment {{ ucfirst($appointment->status) }}</h6>
+                                    <small>{{ \Carbon\Carbon::parse($appointment->created_at)->diffForHumans() }}</small>
+                                </div>
+                                <p class="mb-1">{{ $appointment->patient->user->name }} dengan dokter
+                                    {{ $appointment->doctor->user->name }}</p>
+                            </a>
+                        @endforeach
                     </div>
                 </div>
             </div>
