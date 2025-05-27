@@ -39,7 +39,7 @@
                                     <tr>
                                         <th width="30%">Nama Pasien</th>
                                         <td width="5%">:</td>
-                                        <td>{{ $medicalRecord->patient->name }}</td>
+                                        <td>{{ $medicalRecord->patient->user->name }}</td>
                                     </tr>
                                     <tr>
 
@@ -107,19 +107,6 @@
                             </div>
                             <div class="col-md-6">
                                 <table class="table table-borderless">
-                                    <tr>
-                                        <th width="30%">Status</th>
-                                        <td width="5%">:</td>
-                                        <td>
-                                            @if ($medicalRecord->status == 'selesai')
-                                                <span class="badge badge-success">Selesai</span>
-                                            @elseif($medicalRecord->status == 'tertunda')
-                                                <span class="badge badge-warning">Tertunda</span>
-                                            @else
-                                                <span class="badge badge-primary">Aktif</span>
-                                            @endif
-                                        </td>
-                                    </tr>
                                     <tr>
                                         <th>Diagnosis</th>
                                         <td>:</td>

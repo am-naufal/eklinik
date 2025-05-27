@@ -131,11 +131,13 @@
                                                 <td>{{ $appointment->patient->user->name }}</td>
                                                 <td>{{ $appointment->doctor->user->name }}</td>
                                                 <td>
-                                                    @if ($appointment->status == 'pending')
+                                                    @if ($appointment->status == 'Dijadwalkan')
+                                                        <span class="badge badge-primary">Dijadwalkan</span>
+                                                    @elseif($appointment->status == 'Menunggu')
                                                         <span class="badge badge-warning">Menunggu</span>
-                                                    @elseif($appointment->status == 'completed')
+                                                    @elseif($appointment->status == 'Selesai')
                                                         <span class="badge badge-success">Selesai</span>
-                                                    @elseif($appointment->status == 'cancelled')
+                                                    @elseif($appointment->status == 'Dibatalkan')
                                                         <span class="badge badge-danger">Dibatalkan</span>
                                                     @else
                                                         <span

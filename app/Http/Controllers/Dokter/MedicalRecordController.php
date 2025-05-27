@@ -22,12 +22,12 @@ class MedicalRecordController extends Controller
      */
     public function index()
     {
+
         $doctor = Doctor::where('user_id', Auth::id())->firstOrFail();
         $medicalRecords = MedicalRecord::with(['patient', 'prescription'])
             ->where('doctor_id', $doctor->id)
             ->orderBy('record_date', 'desc')
             ->paginate(10);
-
         return view('dokter.medical_records.index', compact('medicalRecords'));
     }
 
@@ -55,7 +55,7 @@ class MedicalRecordController extends Controller
         try {
             // Validate medical record data
             $validated = $request->validate([
-                'patient_id' => ['required', 'exists:users,id'],
+                'patient_id' => ['required'],
                 'record_date' => ['required', 'date'],
                 'complaint' => ['required', 'string'],
                 'diagnosis' => ['required', 'string'],

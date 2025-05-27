@@ -19,6 +19,8 @@ use App\Http\Controllers\Resepsionis\DashboardController as ResepsionisDashboard
 use App\Http\Controllers\Resepsionis\PatientController as ResepsionisPatientController;
 use App\Http\Controllers\Resepsionis\AppointmentController as ResepsionisAppointmentController;
 use App\Http\Controllers\Resepsionis\InvoiceController;
+use App\Http\Controllers\Admin\RoomController;
+use App\Http\Controllers\Admin\InpatientController;
 
 // Route halaman utama
 Route::get('/', function () {
@@ -93,6 +95,26 @@ Route::prefix('admin')->middleware(['auth', \App\Http\Middleware\CheckRole::clas
         'destroy' => 'admin.medicines.destroy',
     ]);
     Route::post('/medicines/{medicine}/update-stock', [MedicineController::class, 'updateStock'])->name('admin.medicines.update-stock');
+
+    // Room Management Routes
+    Route::resource('rooms', RoomController::class)->names([
+        'index' => 'admin.rooms.index',
+        'create' => 'admin.rooms.create',
+        'store' => 'admin.rooms.store',
+        'show' => 'admin.rooms.show',
+        'edit' => 'admin.rooms.edit',
+        'update' => 'admin.rooms.update',
+        'destroy' => 'admin.rooms.destroy',
+    ]);
+    Route::resource('inpatients', InpatientController::class)->names([
+        'index' => 'admin.inpatients.index',
+        'create' => 'admin.inpatients.create',
+        'store' => 'admin.inpatients.store',
+        'show' => 'admin.inpatients.show',
+        'edit' => 'admin.inpatients.edit',
+        'update' => 'admin.inpatients.update',
+        'destroy' => 'admin.inpatients.destroy',
+    ]);
 });
 
 // Route pemilik klinik

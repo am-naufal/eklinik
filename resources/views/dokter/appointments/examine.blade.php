@@ -139,7 +139,7 @@
                         <form action="{{ route('dokter.medical-records.store') }}" method="POST">
                             @csrf
                             <input type="hidden" name="appointment_id" value="{{ $appointment->id }}">
-                            <input type="hidden" name="patient_id" value="{{ $appointment->patient_id }}">
+                            <input type="hidden" name="patient_id" value="{{ $appointment->patient->id }}">
                             <input type="hidden" name="doctor_id" value="{{ $appointment->doctor_id }}">
                             <input type="hidden" name="record_date" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
 

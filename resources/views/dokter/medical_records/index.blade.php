@@ -43,7 +43,6 @@
                                 <th>Pasien</th>
                                 <th>No. Rekam Medis</th>
                                 <th>Diagnosis</th>
-                                <th>Status</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -51,18 +50,10 @@
                             @forelse($medicalRecords as $record)
                                 <tr>
                                     <td>{{ \Carbon\Carbon::parse($record->record_date)->format('d-m-Y') }}</td>
-                                    <td>{{ $record->patient->name }}</td>
+                                    <td>{{ $record->patient->user->name }}</td>
                                     <td>{{ $record->patient->medical_record_number ?? '-' }}</td>
                                     <td>{{ $record->diagnosis }}</td>
-                                    <td>
-                                        @if ($record->status == 'selesai')
-                                            <span class="badge badge-success">Selesai</span>
-                                        @elseif($record->status == 'tertunda')
-                                            <span class="badge badge-warning">Tertunda</span>
-                                        @else
-                                            <span class="badge badge-primary">Aktif</span>
-                                        @endif
-                                    </td>
+
                                     <td>
                                         <div class="btn-group" role="group">
                                             <a href="{{ route('dokter.medical-records.show', $record->id) }}"

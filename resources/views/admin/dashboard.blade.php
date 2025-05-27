@@ -99,12 +99,14 @@
                                         <td>{{ \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d H:i') }}
                                         </td>
                                         <td>
-                                            @if ($appointment->status == 'completed')
-                                                <span class="badge bg-success">Selesai</span>
-                                            @elseif ($appointment->status == 'waiting')
-                                                <span class="badge bg-warning">Menunggu</span>
-                                            @elseif ($appointment->status == 'scheduled')
+                                            @if ($appointment->status == 'Dijadwalkan')
                                                 <span class="badge bg-primary">Dijadwalkan</span>
+                                            @elseif ($appointment->status == 'Menunggu')
+                                                <span class="badge bg-warning">Menunggu</span>
+                                            @elseif ($appointment->status == 'Selesai')
+                                                <span class="badge bg-success">Selesai</span>
+                                            @elseif ($appointment->status == 'Dibatalkan')
+                                                <span class="badge bg-danger">Dibatalkan</span>
                                             @else
                                                 <span class="badge bg-secondary">{{ $appointment->status }}</span>
                                             @endif

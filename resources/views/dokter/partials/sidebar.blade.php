@@ -17,7 +17,7 @@
     </a>
 </li>
 <li class="nav-item">
-    <a class="nav-link {{ Request::is('dokter/rekam-medis*') ? 'active' : '' }}" href="#">
+    <a class="nav-link {{ Request::is('dokter/medical-records*') ? 'active' : '' }}" href="#">
         <i class="fas fa-fw fa-clipboard-list me-2"></i>
         Rekam Medis
     </a>

@@ -34,12 +34,17 @@
                                 <select class="form-control" id="status" name="status">
                                     <option value="all" {{ request('status', 'all') == 'all' ? 'selected' : '' }}>Semua
                                         Status</option>
-                                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Menunggu
+                                    <option value="Dijadwalkan" {{ request('status') == 'Dijadwalkan' ? 'selected' : '' }}>
+                                        Dijadwalkan
                                     </option>
-                                    <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>
-                                        Selesai</option>
-                                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>
-                                        Dibatalkan</option>
+                                    <option value="Menunggu" {{ request('status') == 'Menunggu' ? 'selected' : '' }}>
+                                        Menunggu
+                                    </option>
+                                    <option value="Selesai" {{ request('status') == 'Selesai' ? 'selected' : '' }}>Selesai
+                                    </option>
+                                    <option value="Dibatalkan" {{ request('status') == 'Dibatalkan' ? 'selected' : '' }}>
+                                        Dibatalkan
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -114,11 +119,13 @@
                                     </td>
                                     <td>{{ $appointment->doctor->user->name }}</td>
                                     <td>
-                                        @if ($appointment->status == 'pending')
+                                        @if ($appointment->status == 'Dijadwalkan')
+                                            <span class="badge badge-primary">Dijadwalkan</span>
+                                        @elseif($appointment->status == 'Menunggu')
                                             <span class="badge badge-warning">Menunggu</span>
-                                        @elseif($appointment->status == 'completed')
+                                        @elseif($appointment->status == 'Selesai')
                                             <span class="badge badge-success">Selesai</span>
-                                        @elseif($appointment->status == 'cancelled')
+                                        @elseif($appointment->status == 'Dibatalkan')
                                             <span class="badge badge-danger">Dibatalkan</span>
                                         @else
                                             <span class="badge badge-secondary">{{ $appointment->status }}</span>

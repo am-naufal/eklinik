@@ -22,7 +22,10 @@ class MedicalRecord extends Model
         'doctor_id',
         'record_date',
         'complaint',
+        'physical_examination',
+        'treatment',
         'diagnosis',
+        'anemnesa',
         'notes',
         'status',
     ];
@@ -41,7 +44,7 @@ class MedicalRecord extends Model
      */
     public function patient(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'patient_id');
+        return $this->belongsTo(Patient::class, 'patient_id');
     }
 
     /**
