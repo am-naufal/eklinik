@@ -17,35 +17,17 @@ class InpatientController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            $inpatients = Inpatient::with(['patient.user', 'room', 'doctor.user'])->get();
-            $data = [];
+        $inpatients = Inpatient::with(['patient', 'room', 'doctor'])->get();
+        return view('admin.inpatients.index', compact('inpatients'));
+    }
 
-            foreach ($inpatients as $inpatient) {
-                $data[] = [
-                    'patient' => [
-                        'medical_record_number' => $inpatient->patient->medical_record_number,
-                    ],
-                    'patient_name' => $inpatient->patient->user->name,
-                    'room_number' => $inpatient->room->room_number,
-                    'doctor_name' => $inpatient->doctor->user->name,
-                    'check_in_date' => $inpatient->check_in_date,
-                    'check_out_date' => $inpatient->check_out_date,
-                    'status' => $inpatient->status,
-                    'status_badge' => view('admin.inpatients.status-badge', compact('inpatient'))->render(),
-                    'action' => view('admin.inpatients.action', compact('inpatient'))->render(),
-                ];
-            }
-
-            return response()->json([
-                'draw' => $request->input('draw'),
-                'recordsTotal' => count($data),
-                'recordsFiltered' => count($data),
-                'data' => $data
-            ]);
-        }
-
-        return view('admin.inpatients.index');
+    /**
+     * Display the specified resource.
+     */
+    public function show(Inpatient $inpatient)
+    {
+        $inpatient->load(['patient.user', 'room', 'doctor.user']);
+        return view('admin.inpatients.show', compact('inpatient'));
     }
 
     /**
