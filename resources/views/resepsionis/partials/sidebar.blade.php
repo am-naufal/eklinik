@@ -8,10 +8,6 @@
 <!-- Divider -->
 <hr class="sidebar-divider">
 
-<!-- Heading -->
-<div class="sidebar-heading">
-    Data Utama
-</div>
 
 <!-- Nav Item - Pasien -->
 <li class="nav-item {{ Request::is('resepsionis/patients*') ? 'active' : '' }}">
@@ -37,6 +33,13 @@
     </a>
 </li>
 
+<!-- Nav Item - Rawat Inap -->
+<li class="nav-item {{ Request::is('resepsionis/inpatients*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ route('resepsionis.inpatients.index') }}">
+        <i class="fas fa-fw fa-bed"></i>
+        <span>Manajemen Rawat Inap</span>
+    </a>
+</li>
 <!-- Divider -->
 <hr class="sidebar-divider d-none d-md-block">
 

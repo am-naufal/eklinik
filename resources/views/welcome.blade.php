@@ -545,6 +545,8 @@
                                 <a href="{{ route('pasien.dashboard') }}" class="btn btn-primary">Dashboard</a>
                             @elseif (Auth::user()->hasRole('resepsionis'))
                                 <a href="{{ route('resepsionis.dashboard') }}" class="btn btn-primary">Dashboard</a>
+                            @elseif (Auth::user()->hasRole('pemilik_klinik'))
+                                <a href="{{ route('pemilik.dashboard') }}" class="btn btn-primary">Dashboard</a>
                             @else
                                 <a href="{{ route('admin.dashboard') }}" class="btn btn-primary">Dashboard</a>
                             @endif

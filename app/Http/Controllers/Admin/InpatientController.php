@@ -17,8 +17,14 @@ class InpatientController extends Controller
      */
     public function index(Request $request)
     {
+
         $inpatients = Inpatient::with(['patient', 'room', 'doctor'])->get();
-        return view('admin.inpatients.index', compact('inpatients'));
+
+        if (Auth::user()->role->name == 'resepsionis') {
+            return view('resepsionis.inpatients.index', compact('inpatients'));
+        } elseif (Auth::user()->role->name == 'admin') {
+            return view('admin.inpatients.index', compact('inpatients'));
+        }
     }
 
     /**
@@ -27,7 +33,11 @@ class InpatientController extends Controller
     public function show(Inpatient $inpatient)
     {
         $inpatient->load(['patient.user', 'room', 'doctor.user']);
-        return view('admin.inpatients.show', compact('inpatient'));
+        if (Auth::user()->role->name == 'resepsionis') {
+            return view('resepsionis.inpatients.show', compact('inpatient'));
+        } elseif (Auth::user()->role->name == 'admin') {
+            return view('admin.inpatients.show', compact('inpatient'));
+        }
     }
 
     /**
@@ -37,9 +47,12 @@ class InpatientController extends Controller
     {
         $patients = Patient::with('user')->get();
         $doctors = Doctor::with('user')->get();
-        $rooms = Room::where('status', 'available')->get();
-
-        return view('admin.inpatients.create', compact('patients', 'doctors', 'rooms'));
+        $rooms = Room::where('status', 'tersedia')->get();
+        if (Auth::user()->role->name == 'resepsionis') {
+            return view('resepsionis.inpatients.create', compact('patients', 'doctors', 'rooms'));
+        } elseif (Auth::user()->role->name == 'admin') {
+            return view('admin.inpatients.create', compact('patients', 'doctors', 'rooms'));
+        }
     }
 
     /**
@@ -64,10 +77,15 @@ class InpatientController extends Controller
 
         // Update room status
         $room = Room::find($validated['room_id']);
-        $room->update(['status' => 'occupied']);
+        $room->update(['status' => 'terisi']);
 
-        return redirect()->route('admin.inpatients.index')
-            ->with('success', 'Data rawat inap berhasil ditambahkan');
+        if (Auth::user()->role->name == 'resepsionis') {
+            return redirect()->route('resepsionis.inpatients.index')
+                ->with('success', 'Data rawat inap berhasil ditambahkan');
+        } elseif (Auth::user()->role->name == 'admin') {
+            return redirect()->route('admin.inpatients.index')
+                ->with('success', 'Data rawat inap berhasil ditambahkan');
+        }
     }
 
     /**
@@ -77,11 +95,15 @@ class InpatientController extends Controller
     {
         $patients = Patient::with('user')->get();
         $doctors = Doctor::with('user')->get();
-        $rooms = Room::where('status', 'available')
+        $rooms = Room::where('status', 'tersedia')
             ->orWhere('id', $inpatient->room_id)
             ->get();
 
-        return view('admin.inpatients.edit', compact('inpatient', 'patients', 'doctors', 'rooms'));
+        if (Auth::user()->role->name == 'resepsionis') {
+            return view('resepsionis.inpatients.edit', compact('inpatient', 'patients', 'doctors', 'rooms'));
+        } elseif (Auth::user()->role->name == 'admin') {
+            return view('admin.inpatients.edit', compact('inpatient', 'patients', 'doctors', 'rooms'));
+        }
     }
 
     /**
@@ -107,24 +129,29 @@ class InpatientController extends Controller
         if ($inpatient->room_id !== $validated['room_id']) {
             // Free up the old room
             $oldRoom = Room::find($inpatient->room_id);
-            $oldRoom->update(['status' => 'available']);
+            $oldRoom->update(['status' => 'tersedia']);
 
             // Occupy the new room
             $newRoom = Room::find($validated['room_id']);
-            $newRoom->update(['status' => 'occupied']);
+            $newRoom->update(['status' => 'terisi']);
         }
 
         // If status is changed to discharged
         if ($validated['status'] === 'discharged' && !$inpatient->check_out_date) {
             $validated['check_out_date'] = now();
             $room = Room::find($validated['room_id']);
-            $room->update(['status' => 'available']);
+            $room->update(['status' => 'tersedia']);
         }
 
         $inpatient->update($validated);
 
-        return redirect()->route('admin.inpatients.index')
-            ->with('success', 'Data rawat inap berhasil diperbarui');
+        if (Auth::user()->role->name == 'resepsionis') {
+            return redirect()->route('resepsionis.inpatients.index')
+                ->with('success', 'Data rawat inap berhasil diperbarui');
+        } elseif (Auth::user()->role->name == 'admin') {
+            return redirect()->route('admin.inpatients.index')
+                ->with('success', 'Data rawat inap berhasil diperbarui');
+        }
     }
 
     /**

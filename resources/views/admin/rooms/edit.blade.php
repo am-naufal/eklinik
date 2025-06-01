@@ -114,14 +114,14 @@
                                 <label for="status">Status <span class="text-danger">*</span></label>
                                 <select class="form-control @error('status') is-invalid @enderror" id="status"
                                     name="status" required>
-                                    <option value="available"
-                                        {{ old('status', $room->status) == 'available' ? 'selected' : '' }}>Tersedia
+                                    <option value="tersedia"
+                                        {{ old('status', $room->status) == 'tersedia' ? 'selected' : '' }}>Tersedia
                                     </option>
-                                    <option value="maintenance"
-                                        {{ old('status', $room->status) == 'maintenance' ? 'selected' : '' }}>Maintenance
+                                    <option value="perbaikan"
+                                        {{ old('status', $room->status) == 'perbaikan' ? 'selected' : '' }}>Perbaikan
                                     </option>
-                                    <option value="occupied"
-                                        {{ old('status', $room->status) == 'occupied' ? 'selected' : '' }}>Terisi</option>
+                                    <option value="terisi"
+                                        {{ old('status', $room->status) == 'terisi' ? 'selected' : '' }}>Terisi</option>
                                 </select>
                                 @error('status')
                                     <div class="invalid-feedback">{{ $message }}</div>

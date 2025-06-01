@@ -114,7 +114,7 @@ Route::prefix('admin')->middleware(['auth', \App\Http\Middleware\CheckRole::clas
         'edit' => 'admin.inpatients.edit',
         'update' => 'admin.inpatients.update',
         'destroy' => 'admin.inpatients.destroy',
-    ]);
+    ])->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':resepsionis,admin']);
 });
 
 // Route pemilik klinik
@@ -134,7 +134,7 @@ Route::prefix('pemilik')->middleware(['auth', \App\Http\Middleware\CheckRole::cl
 });
 
 // Route resepsionis
-Route::prefix('resepsionis')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':resepsionis'])->group(function () {
+Route::prefix('resepsionis')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':resepsionis,admin'])->group(function () {
     Route::get('/dashboard', [ResepsionisDashboardController::class, 'index'])->name('resepsionis.dashboard');
 
     // Routes manajemen pasien
@@ -173,6 +173,17 @@ Route::prefix('resepsionis')->middleware(['auth', \App\Http\Middleware\CheckRole
     ]);
     Route::get('/invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('resepsionis.invoices.print');
     Route::put('/invoices/{invoice}/mark-as-paid', [InvoiceController::class, 'markAsPaid'])->name('resepsionis.invoices.mark-as-paid');
+
+    // Routes manajemen ruang rawat inap
+    Route::resource('inpatients', InpatientController::class)->names([
+        'index' => 'resepsionis.inpatients.index',
+        'create' => 'resepsionis.inpatients.create',
+        'store' => 'resepsionis.inpatients.store',
+        'show' => 'resepsionis.inpatients.show',
+        'edit' => 'resepsionis.inpatients.edit',
+        'update' => 'resepsionis.inpatients.update',
+        'destroy' => 'resepsionis.inpatients.destroy',
+    ]);
 });
 
 // Route dokter

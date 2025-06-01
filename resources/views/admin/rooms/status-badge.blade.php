@@ -1,17 +1,17 @@
 @php
     $statusClasses = [
-        'available' => 'success',
-        'occupied' => 'danger',
-        'maintenance' => 'warning',
+        'tersedia' => 'success',
+        'terisi' => 'danger',
+        'perbaikan' => 'warning',
     ];
 
     $statusLabels = [
-        'available' => 'Tersedia',
-        'occupied' => 'Terisi',
-        'maintenance' => 'Maintenance',
+        'tersedia' => 'Tersedia',
+        'terisi' => 'Terisi',
+        'perbaikan' => 'Perbaikan',
     ];
 @endphp
 
-<span class="badge badge-{{ $statusClasses[$room->status] }}">
-    {{ $statusLabels[$room->status] }}
+<span class="badge badge-{{ $statusClasses[$room->status] ?? 'secondary' }}">
+    {{ $statusLabels[$room->status] ?? 'Tidak Diketahui' }}
 </span>

@@ -105,10 +105,12 @@
                                 <label for="status">Status <span class="text-danger">*</span></label>
                                 <select class="form-control @error('status') is-invalid @enderror" id="status"
                                     name="status" required>
-                                    <option value="available" {{ old('status') == 'available' ? 'selected' : '' }}>Tersedia
+                                    <option value="tersedia" {{ old('status') == 'tersedia' ? 'selected' : '' }}>Tersedia
                                     </option>
-                                    <option value="maintenance" {{ old('status') == 'maintenance' ? 'selected' : '' }}>
-                                        Maintenance</option>
+                                    <option value="terisi" {{ old('status') == 'terisi' ? 'selected' : '' }}>Terisi
+                                    </option>
+                                    <option value="perbaikan" {{ old('status') == 'perbaikan' ? 'selected' : '' }}>
+                                        Perbaikan</option>
                                 </select>
                                 @error('status')
                                     <div class="invalid-feedback">{{ $message }}</div>

@@ -1,7 +1,5 @@
 @extends('layouts.app')
-
 @section('title', 'Data Rawat Inap')
-
 @section('content')
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -13,8 +11,8 @@
 
         <div class="card">
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
+                <div class="table-responsive" style="min-height: 300px;">
+                    <table class="table table-bordered table-hover" style="width: 100%;">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -44,20 +42,14 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('admin.inpatients.show', $inpatient) }}"
+                                        <a href="{{ route('resepsionis.inpatients.show', $inpatient) }}"
                                             class="btn btn-info btn-sm">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ route('admin.inpatients.edit', $inpatient) }}"
+                                        <a href="{{ route('resepsionis.inpatients.edit', $inpatient) }}"
                                             class="btn btn-warning btn-sm">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        @if ($inpatient->status !== 'active')
-                                            <button type="button" class="btn btn-danger btn-sm"
-                                                onclick="deleteInpatient({{ $inpatient->id }})">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        @endif
                                     </td>
                                 </tr>
                             @empty
@@ -71,31 +63,4 @@
             </div>
         </div>
     </div>
-
 @endsection
-@push('scripts')
-    <script>
-        function deleteInpatient(id) {
-            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-                $.ajax({
-                    url: `/admin/inpatients/${id}`,
-                    type: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            alert(response.message);
-                            location.reload();
-                        } else {
-                            alert(response.message);
-                        }
-                    },
-                    error: function(xhr) {
-                        alert('Terjadi kesalahan saat menghapus data');
-                    }
-                });
-            }
-        }
-    </script>
-@endpush

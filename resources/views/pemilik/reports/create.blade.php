@@ -1,4 +1,4 @@
-@extends('layouts.pemilik')
+@extends('layouts.app')
 
 @section('title', 'Buat Laporan Baru')
 

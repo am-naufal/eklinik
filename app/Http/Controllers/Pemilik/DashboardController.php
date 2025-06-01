@@ -9,6 +9,7 @@ use App\Models\MedicalRecord;
 use App\Models\Patient;
 use App\Models\Report;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller

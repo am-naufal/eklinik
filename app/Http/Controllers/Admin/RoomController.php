@@ -13,33 +13,8 @@ class RoomController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            $rooms = Room::all();
-            $data = [];
-
-            foreach ($rooms as $room) {
-                $data[] = [
-                    'room_number' => $room->room_number,
-                    'name' => $room->name,
-                    'room_type' => $room->room_type,
-                    'floor' => $room->floor,
-                    'capacity' => $room->capacity,
-                    'price_per_day' => $room->price_per_day,
-                    'status' => $room->status,
-                    'status_badge' => view('admin.rooms.status-badge', compact('room'))->render(),
-                    'action' => view('admin.rooms.action', compact('room'))->render(),
-                ];
-            }
-
-            return response()->json([
-                'draw' => $request->input('draw'),
-                'recordsTotal' => count($data),
-                'recordsFiltered' => count($data),
-                'data' => $data
-            ]);
-        }
-
-        return view('admin.rooms.index');
+        $rooms = Room::query()->orderBy('room_number', 'asc')->get();
+        return view('admin.rooms.index', compact('rooms'));
     }
 
     /**
@@ -62,7 +37,7 @@ class RoomController extends Controller
             'floor' => 'required|integer|min:1',
             'capacity' => 'required|integer|min:1',
             'price_per_day' => 'required|numeric|min:0',
-            'status' => 'required|in:available,occupied,maintenance',
+            'status' => 'required|in:tersedia,terisi,perbaikan',
             'description' => 'nullable|string'
         ]);
 
@@ -92,7 +67,7 @@ class RoomController extends Controller
             'floor' => 'required|integer|min:1',
             'capacity' => 'required|integer|min:1',
             'price_per_day' => 'required|numeric|min:0',
-            'status' => 'required|in:available,occupied,maintenance',
+            'status' => 'required|in:tersedia,terisi,perbaikan',
             'description' => 'nullable|string'
         ]);
 

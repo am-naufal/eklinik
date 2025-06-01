@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('floor');
             $table->integer('capacity');
             $table->decimal('price_per_day', 10, 2);
-            $table->enum('status', ['available', 'occupied', 'maintenance'])->default('available');
+            $table->enum('status', ['tersedia', 'terisi', 'perbaikan'])->default('tersedia');
             $table->text('description')->nullable();
             $table->timestamps();
         });

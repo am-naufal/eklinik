@@ -15,7 +15,7 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        if (!$request->user() || !$request->user()->hasRole($role)) {
+        if (!$request->user() || !$request->user()->hasRole($role) || $request->user()->role->name != $role) {
             return redirect('/')->with('error', 'Anda tidak memiliki akses ke halaman ini.');
         }
 
