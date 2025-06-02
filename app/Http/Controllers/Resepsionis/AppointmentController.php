@@ -100,7 +100,8 @@ class AppointmentController extends Controller
      */
     public function show(string $id)
     {
-        $appointment = Appointment::with(['patient.user', 'doctor.user', 'medicalRecord'])->findOrFail($id);
+        $appointment = Appointment::with(['patient.user', 'doctor.user'])->findOrFail($id);
+        // dd($appointment);
         return view('resepsionis.appointments.show', compact('appointment'));
     }
 
@@ -129,7 +130,7 @@ class AppointmentController extends Controller
             'appointment_date' => 'required|date',
             'appointment_time' => 'required',
             'notes' => 'nullable|string',
-            'status' => 'required|in:pending,completed,cancelled',
+            'status' => 'required|in:Dijadwalkan,Menunggu,Selesai,Dibatalkan',
         ]);
 
         if ($validator->fails()) {
@@ -141,8 +142,8 @@ class AppointmentController extends Controller
         // Periksa konflik jadwal (hanya jika mengubah dokter, tanggal, atau waktu)
         if (
             $appointment->doctor_id != $request->doctor_id ||
-            $appointment->appointment_date->format('Y-m-d') != $request->appointment_date ||
-            $appointment->appointment_time->format('H:i:s') != $request->appointment_time
+            Carbon::parse($appointment->appointment_date)->format('Y-m-d') != $request->appointment_date ||
+            Carbon::parse($appointment->appointment_time)->format('H:i:s') != $request->appointment_time
         ) {
 
             $appointmentDateTime = Carbon::parse($request->appointment_date . ' ' . $request->appointment_time);

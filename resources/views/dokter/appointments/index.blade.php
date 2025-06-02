@@ -1,4 +1,4 @@
-@extends('layouts.dokter')
+@extends('layouts.app')
 
 @section('title', 'Jadwal Kunjungan Saya')
 
@@ -22,49 +22,7 @@
             </div>
         @endif
 
-        <!-- Filter -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Filter</h6>
-            </div>
-            <div class="card-body">
-                <form method="GET" action="{{ route('dokter.appointments.index') }}">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="date">Tanggal</label>
-                                <input type="date" class="form-control" id="date" name="date"
-                                    value="{{ request('date') }}">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="status">Status</label>
-                                <select class="form-control" id="status" name="status">
-                                    <option value="">Semua Status</option>
-                                    <option value="Dijadwalkan" {{ request('status') == 'Dijadwalkan' ? 'selected' : '' }}>
-                                        Dijadwalkan</option>
-                                    <option value="Menunggu" {{ request('status') == 'Menunggu' ? 'selected' : '' }}>
-                                        Menunggu</option>
-                                    <option value="Selesai" {{ request('status') == 'Selesai' ? 'selected' : '' }}>Selesai
-                                    </option>
-                                    <option value="Dibatalkan" {{ request('status') == 'Dibatalkan' ? 'selected' : '' }}>
-                                        Dibatalkan</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary mr-2">
-                                <i class="fas fa-search"></i> Filter
-                            </button>
-                            <a href="{{ route('dokter.appointments.index') }}" class="btn btn-secondary">
-                                <i class="fas fa-sync"></i> Reset
-                            </a>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
+
 
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
@@ -110,26 +68,27 @@
                                                 class="btn btn-info btn-sm">
                                                 <i class="fas fa-eye"></i> Detail
                                             </a>
-                                            <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
-                                                data-target="#updateStatusModal{{ $appointment->id }}">
+                                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#updateStatusModal{{ $appointment->id }}">
                                                 <i class="fas fa-edit"></i> Update
                                             </button>
+                                            <a href="{{ route('dokter.appointments.examine', $appointment->id) }}"
+                                                class="btn btn-primary btn-sm">
+                                                <i class="fas fa-stethoscope"></i> Pemeriksaan
+                                            </a>
                                         </div>
-
                                         <!-- Modal Update Status -->
                                         <div class="modal fade" id="updateStatusModal{{ $appointment->id }}" tabindex="-1"
-                                            role="dialog" aria-labelledby="updateStatusModalLabel{{ $appointment->id }}"
+                                            aria-labelledby="updateStatusModalLabel{{ $appointment->id }}"
                                             aria-hidden="true">
-                                            <div class="modal-dialog" role="document">
+                                            <div class="modal-dialog">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title"
                                                             id="updateStatusModalLabel{{ $appointment->id }}">Update Status
                                                             Kunjungan</h5>
-                                                        <button type="button" class="close" data-dismiss="modal"
-                                                            aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
                                                     </div>
                                                     <form
                                                         action="{{ route('dokter.appointments.update', $appointment->id) }}"
@@ -137,9 +96,10 @@
                                                         @csrf
                                                         @method('PUT')
                                                         <div class="modal-body">
-                                                            <div class="form-group">
-                                                                <label for="status{{ $appointment->id }}">Status</label>
-                                                                <select class="form-control"
+                                                            <div class="mb-3">
+                                                                <label for="status{{ $appointment->id }}"
+                                                                    class="form-label">Status</label>
+                                                                <select class="form-select"
                                                                     id="status{{ $appointment->id }}" name="status"
                                                                     required>
                                                                     <option value="Dijadwalkan"
@@ -156,14 +116,15 @@
                                                                         Dibatalkan</option>
                                                                 </select>
                                                             </div>
-                                                            <div class="form-group">
-                                                                <label for="notes{{ $appointment->id }}">Catatan</label>
+                                                            <div class="mb-3">
+                                                                <label for="notes{{ $appointment->id }}"
+                                                                    class="form-label">Catatan</label>
                                                                 <textarea class="form-control" id="notes{{ $appointment->id }}" name="notes" rows="3">{{ $appointment->notes }}</textarea>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary"
-                                                                data-dismiss="modal">Batal</button>
+                                                                data-bs-dismiss="modal">Batal</button>
                                                             <button type="submit" class="btn btn-primary">Simpan
                                                                 Perubahan</button>
                                                         </div>
@@ -190,7 +151,7 @@
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
     <script>
         $(document).ready(function() {
             $('#dataTable').DataTable({
@@ -199,5 +160,19 @@
                 }
             });
         });
+
+        // Pastikan modal berfungsi dengan baik
+        document.addEventListener('DOMContentLoaded', function() {
+            var modals = document.querySelectorAll('.modal');
+            modals.forEach(function(modal) {
+                modal.addEventListener('shown.bs.modal', function() {
+                    // Fokus ke elemen pertama dalam modal
+                    var firstInput = this.querySelector('input, select, textarea');
+                    if (firstInput) {
+                        firstInput.focus();
+                    }
+                });
+            });
+        });
     </script>
-@endsection
+@endpush

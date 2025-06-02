@@ -54,7 +54,7 @@
                                     <td>{{ $appointments->firstItem() + $index }}</td>
                                     <td>{{ $appointment->appointment_date->format('d M Y') }}</td>
                                     <td>{{ $appointment->appointment_time }}</td>
-                                    <td>{{ $appointment->doctor->name }}</td>
+                                    <td>{{ $appointment->doctor->user->name }}</td>
                                     <td>
                                         @if ($appointment->status == 'menunggu')
                                             <span class="badge bg-warning text-dark">Menunggu</span>

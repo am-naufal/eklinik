@@ -36,14 +36,16 @@
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                         <h6 class="m-0 font-weight-bold text-primary">Informasi Kunjungan</h6>
-                        <span
-                            class="badge badge-pill
-                        @if ($appointment->status == 'Dijadwalkan') badge-primary
-                        @elseif($appointment->status == 'Menunggu') badge-warning
-                        @elseif($appointment->status == 'Selesai') badge-success
-                        @elseif($appointment->status == 'Dibatalkan') badge-danger @endif px-3 py-2">
-                            {{ $appointment->status }}
-                        </span>
+
+                        @if ($appointment->status == 'Dijadwalkan')
+                            <span class="badge bg-primary text-white">Dijadwalkan</span>
+                        @elseif($appointment->status == 'Menunggu')
+                            <span class="badge bg-warning text-dark">Menunggu</span>
+                        @elseif($appointment->status == 'Selesai')
+                            <span class="badge bg-success text-white">Selesai</span>
+                        @elseif($appointment->status == 'Dibatalkan')
+                            <span class="badge bg-danger text-white">Dibatalkan</span>
+                        @endif
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -75,7 +77,7 @@
                                         </tr>
                                         <tr>
                                             <td class="bg-light">No. Rekam Medis</td>
-                                            <td>{{ $appointment->patient->no_rekam_medis }}</td>
+                                            <td>{{ $appointment->patient->medical_record_number }}</td>
                                         </tr>
                                         <tr>
                                             <td class="bg-light">Email</td>
@@ -83,15 +85,16 @@
                                         </tr>
                                         <tr>
                                             <td class="bg-light">No. Telepon</td>
-                                            <td>{{ $appointment->patient->phone ?? '-' }}</td>
+                                            <td>{{ $appointment->patient->phone_number ?? '-' }}</td>
                                         </tr>
                                         <tr>
                                             <td class="bg-light">Jenis Kelamin</td>
                                             <td>{{ $appointment->patient->gender }}</td>
                                         </tr>
+
                                         <tr>
                                             <td class="bg-light">Tanggal Lahir</td>
-                                            <td>{{ $appointment->patient->birth_date ? $appointment->patient->birth_date->format('d F Y') : '-' }}
+                                            <td>{{ $appointment->patient->date_of_birth ?? '-' }}
                                             </td>
                                         </tr>
                                     </table>
@@ -117,14 +120,17 @@
                                         <tr>
                                             <td class="bg-light">Status</td>
                                             <td>
-                                                <span
-                                                    class="badge badge-pill
-                                                @if ($appointment->status == 'Dijadwalkan') badge-primary
-                                                @elseif($appointment->status == 'Menunggu') badge-warning
-                                                @elseif($appointment->status == 'Selesai') badge-success
-                                                @elseif($appointment->status == 'Dibatalkan') badge-danger @endif px-3 py-2">
-                                                    {{ $appointment->status }}
-                                                </span>
+
+                                                @if ($appointment->status == 'Dijadwalkan')
+                                                    <span class="badge bg-primary text-white">Dijadwalkan</span>
+                                                @elseif($appointment->status == 'Menunggu')
+                                                    <span class="badge bg-warning text-dark">Menunggu</span>
+                                                @elseif($appointment->status == 'Selesai')
+                                                    <span class="badge bg-success text-white">Selesai</span>
+                                                @elseif($appointment->status == 'Dibatalkan')
+                                                    <span class="badge bg-danger text-white">Dibatalkan</span>
+                                                @endif
+
                                             </td>
                                         </tr>
                                         <tr>

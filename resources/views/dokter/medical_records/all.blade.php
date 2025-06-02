@@ -6,7 +6,7 @@
     <div class="container-fluid">
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Rekam Medis</h1>
+            <h1 class="h3 mb-0 text-gray-800">Semua Rekam Medis</h1>
         </div>
 
         @if (session('success'))
@@ -20,9 +20,6 @@
                 {{ session('error') }}
             </div>
         @endif
-        <a href="{{ route('dokter.medical-records.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Tambah Rekam Medis
-        </a>
 
         <!-- DataTales Example -->
         <div class="card shadow mb-4">

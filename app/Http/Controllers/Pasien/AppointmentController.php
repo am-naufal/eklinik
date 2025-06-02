@@ -17,9 +17,9 @@ class AppointmentController extends Controller
     public function index()
     {
         $patient = Patient::where('user_id', Auth::id())->first();
-        // $patientall = Patient::all();
 
-        // dd($patientall);
+
+
         if (!$patient) {
             return redirect()->route('pasien.dashboard')
                 ->with('error', 'Data pasien tidak ditemukan');
@@ -48,7 +48,7 @@ class AppointmentController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         $request->validate([
             'doctor_id' => 'required|exists:doctors,id',
             'appointment_date' => 'required|date|after_or_equal:today',
@@ -69,17 +69,10 @@ class AppointmentController extends Controller
             'appointment_date' => $request->appointment_date,
             'appointment_time' => $request->appointment_time,
             'reason' => $request->reason,
-            'status' => 'selesai',
+            'status' => 'dijadwalkan',
             'notes' => $request->notes ?? null,
         ]);
 
-        $appointment = Appointment::where('patient_id', $patient->id)
-            ->where('doctor_id', $request->doctor_id)
-            ->where('appointment_date', $request->appointment_date)
-            ->where('appointment_time', $request->appointment_time)
-            ->first();
-
-        $appointment->update(['status' => 'selesai']);
 
         return redirect()->route('pasien.appointments.index')
             ->with('success', 'Jadwal kunjungan berhasil dibuat');

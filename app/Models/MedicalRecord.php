@@ -20,6 +20,7 @@ class MedicalRecord extends Model
     protected $fillable = [
         'patient_id',
         'doctor_id',
+        'appointment_id',
         'record_date',
         'complaint',
         'physical_examination',
@@ -53,6 +54,14 @@ class MedicalRecord extends Model
     public function doctor(): BelongsTo
     {
         return $this->belongsTo(Doctor::class);
+    }
+
+    /**
+     * Get the appointment associated with the medical record
+     */
+    public function appointment(): BelongsTo
+    {
+        return $this->belongsTo(Appointment::class);
     }
 
     /**

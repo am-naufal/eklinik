@@ -20,7 +20,7 @@ return new class extends Migration
             $table->dateTime('check_out_date')->nullable();
             $table->text('diagnosis');
             $table->text('treatment_plan');
-            $table->enum('status', ['active', 'discharged', 'transferred'])->default('active');
+            $table->enum('status', ['active', 'pulang', 'dipindahkan'])->default('active');
             $table->text('notes')->nullable();
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');

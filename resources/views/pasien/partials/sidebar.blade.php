@@ -12,21 +12,10 @@
     </a>
 </li>
 <li class="nav-item">
-    <a class="nav-link {{ Request::is('pasien/dokter*') ? 'active' : '' }}" href="#">
-        <i class="fas fa-fw fa-user-md me-2"></i>
-        Dokter
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link {{ Request::is('pasien/rekam-medis*') ? 'active' : '' }}" href="#">
+    <a class="nav-link {{ Request::is('pasien/rekam-medis*') ? 'active' : '' }}"
+        href="{{ route('pasien.medicalrecords.index') }}">
         <i class="fas fa-fw fa-clipboard-list me-2"></i>
         Rekam Medis Saya
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link {{ Request::is('pasien/pembayaran*') ? 'active' : '' }}" href="#">
-        <i class="fas fa-fw fa-credit-card me-2"></i>
-        Pembayaran
     </a>
 </li>
 <li class="nav-item">

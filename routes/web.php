@@ -21,6 +21,7 @@ use App\Http\Controllers\Resepsionis\AppointmentController as ResepsionisAppoint
 use App\Http\Controllers\Resepsionis\InvoiceController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\InpatientController;
+use App\Http\Controllers\Resepsionis\InpatientController as ResepsionisInpatientController;
 
 // Route halaman utama
 Route::get('/', function () {
@@ -114,7 +115,7 @@ Route::prefix('admin')->middleware(['auth', \App\Http\Middleware\CheckRole::clas
         'edit' => 'admin.inpatients.edit',
         'update' => 'admin.inpatients.update',
         'destroy' => 'admin.inpatients.destroy',
-    ])->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':resepsionis,admin']);
+    ]);
 });
 
 // Route pemilik klinik
@@ -134,7 +135,7 @@ Route::prefix('pemilik')->middleware(['auth', \App\Http\Middleware\CheckRole::cl
 });
 
 // Route resepsionis
-Route::prefix('resepsionis')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':resepsionis,admin'])->group(function () {
+Route::prefix('resepsionis')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':resepsionis'])->group(function () {
     Route::get('/dashboard', [ResepsionisDashboardController::class, 'index'])->name('resepsionis.dashboard');
 
     // Routes manajemen pasien
@@ -175,7 +176,7 @@ Route::prefix('resepsionis')->middleware(['auth', \App\Http\Middleware\CheckRole
     Route::put('/invoices/{invoice}/mark-as-paid', [InvoiceController::class, 'markAsPaid'])->name('resepsionis.invoices.mark-as-paid');
 
     // Routes manajemen ruang rawat inap
-    Route::resource('inpatients', InpatientController::class)->names([
+    Route::resource('inpatients', ResepsionisInpatientController::class)->names([
         'index' => 'resepsionis.inpatients.index',
         'create' => 'resepsionis.inpatients.create',
         'store' => 'resepsionis.inpatients.store',
@@ -213,6 +214,30 @@ Route::prefix('dokter')->middleware(['auth', \App\Http\Middleware\CheckRole::cla
     ]);
     // Tambahkan rute khusus untuk pemeriksaan pasien
     Route::get('/appointments/{appointment}/examine', [DokterAppointmentController::class, 'examine'])->name('dokter.appointments.examine');
+
+    // Routes manajemen obat
+    Route::resource('medicines', \App\Http\Controllers\Dokter\MedicineController::class)->names([
+        'index' => 'dokter.medicines.index',
+        'create' => 'dokter.medicines.create',
+        'store' => 'dokter.medicines.store',
+        'show' => 'dokter.medicines.show',
+        'edit' => 'dokter.medicines.edit',
+        'update' => 'dokter.medicines.update',
+        'destroy' => 'dokter.medicines.destroy',
+    ]);
+
+    Route::get('/medical-records-all/', [MedicalRecordController::class, 'showAllMedicalRecords'])->name('dokter.medical-records.semua');
+
+    // Routes manajemen pasien rawat inap
+    Route::resource('inpatients', \App\Http\Controllers\Dokter\InpatientController::class)->only([
+        'index',
+        'show',
+        'update'
+    ])->names([
+        'index' => 'dokter.inpatients.index',
+        'show' => 'dokter.inpatients.show',
+        'update' => 'dokter.inpatients.update',
+    ]);
 });
 
 // Route pasien
@@ -225,8 +250,11 @@ Route::prefix('pasien')->middleware(['auth', \App\Http\Middleware\CheckRole::cla
     Route::post('/jadwal', [App\Http\Controllers\Pasien\AppointmentController::class, 'store'])->name('pasien.appointments.store');
     Route::get('/jadwal/{appointment}', [App\Http\Controllers\Pasien\AppointmentController::class, 'show'])->name('pasien.appointments.show');
     Route::put('/jadwal/{appointment}/cancel', [App\Http\Controllers\Pasien\AppointmentController::class, 'cancel'])->name('pasien.appointments.cancel');
-});
 
+    // Routes rekam medis untuk pasien
+    Route::get('/rekam-medis', [App\Http\Controllers\Pasien\MedicalRecordController::class, 'index'])->name('pasien.medicalrecords.index');
+    Route::get('/rekam-medis/{medicalRecord}', [App\Http\Controllers\Pasien\MedicalRecordController::class, 'show'])->name('pasien.medicalrecords.show');
+});
 
 use Illuminate\Support\Facades\Artisan;
 

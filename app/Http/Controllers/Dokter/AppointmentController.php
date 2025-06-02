@@ -42,9 +42,7 @@ class AppointmentController extends Controller
             return redirect()->route('dokter.appointments.index')
                 ->with('error', 'Anda tidak memiliki akses untuk melihat kunjungan ini.');
         }
-
         $appointment->load(['patient.user', 'doctor.user']);
-
         return view('dokter.appointments.show', compact('appointment'));
     }
 

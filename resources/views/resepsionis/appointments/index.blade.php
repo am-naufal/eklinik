@@ -120,16 +120,15 @@
                                     <td>{{ $appointment->doctor->user->name }}</td>
                                     <td>
                                         @if ($appointment->status == 'Dijadwalkan')
-                                            <span class="badge badge-primary">Dijadwalkan</span>
+                                            <span class="badge bg-primary text-white">Dijadwalkan</span>
                                         @elseif($appointment->status == 'Menunggu')
-                                            <span class="badge badge-warning">Menunggu</span>
+                                            <span class="badge bg-warning text-dark">Menunggu</span>
                                         @elseif($appointment->status == 'Selesai')
-                                            <span class="badge badge-success">Selesai</span>
+                                            <span class="badge bg-success text-white">Selesai</span>
                                         @elseif($appointment->status == 'Dibatalkan')
-                                            <span class="badge badge-danger">Dibatalkan</span>
-                                        @else
-                                            <span class="badge badge-secondary">{{ $appointment->status }}</span>
+                                            <span class="badge bg-danger text-white">Dibatalkan</span>
                                         @endif
+
                                     </td>
                                     <td>{{ $appointment->notes ?? '-' }}</td>
                                     <td>

@@ -13,8 +13,17 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Jadwal Berikutnya</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">25 Jun 2023</div>
-                            <div class="text-xs">dr. Budi Santoso (Dokter Umum)</div>
+                            @if ($nextAppointment)
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    {{ $nextAppointment->appointment_date->format('d M Y') }}
+                                </div>
+                                <div class="text-xs">
+                                    {{ $nextAppointment->doctor->user->name }}
+                                    ({{ $nextAppointment->doctor->specialization }})
+                                </div>
+                            @else
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">Tidak ada jadwal</div>
+                            @endif
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
@@ -31,7 +40,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Total Kunjungan</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">6</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalVisits }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-hospital fa-2x text-gray-300"></i>
@@ -49,7 +58,7 @@
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 Resep Aktif
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">2</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $activePrescriptions }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-prescription fa-2x text-gray-300"></i>
@@ -68,36 +77,23 @@
                 </div>
                 <div class="card-body">
                     <div class="timeline-container">
-                        <div class="timeline-item">
-                            <div class="timeline-date">15 Juni 2023</div>
-                            <div class="timeline-content">
-                                <h6>Pemeriksaan Rutin</h6>
-                                <p>dr. Budi Santoso (Dokter Umum)</p>
-                                <p><strong>Diagnosa:</strong> Batuk, Pilek</p>
-                                <p><strong>Tindakan:</strong> Pemberian resep obat batuk dan multivitamin</p>
-                                <a href="#" class="btn btn-sm btn-primary">Lihat Detail</a>
+                        @forelse($recentVisits as $visit)
+                            <div class="timeline-item">
+                                <div class="timeline-date">{{ $visit->record_date->format('d F Y') }}</div>
+                                <div class="timeline-content">
+                                    <h6>{{ $visit->complaint }}</h6>
+                                    <p>{{ $visit->doctor->user->name }} ({{ $visit->doctor->specialization }})</p>
+                                    <p><strong>Diagnosa:</strong> {{ $visit->diagnosis }}</p>
+                                    <p><strong>Tindakan:</strong> {{ $visit->treatment }}</p>
+                                    <a href="{{ route('pasien.medical-records.show', $visit->id) }}"
+                                        class="btn btn-sm btn-primary">Lihat Detail</a>
+                                </div>
                             </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-date">28 April 2023</div>
-                            <div class="timeline-content">
-                                <h6>Konsultasi Gizi</h6>
-                                <p>dr. Diana Putri (Spesialis Gizi)</p>
-                                <p><strong>Diagnosa:</strong> Kekurangan nutrisi</p>
-                                <p><strong>Tindakan:</strong> Pemberian panduan diet dan suplemen</p>
-                                <a href="#" class="btn btn-sm btn-primary">Lihat Detail</a>
+                        @empty
+                            <div class="text-center py-3">
+                                <p class="text-muted">Belum ada riwayat kunjungan</p>
                             </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-date">12 Maret 2023</div>
-                            <div class="timeline-content">
-                                <h6>Cek Tekanan Darah</h6>
-                                <p>dr. Eko Prasetyo (Spesialis Jantung)</p>
-                                <p><strong>Diagnosa:</strong> Tekanan darah normal</p>
-                                <p><strong>Tindakan:</strong> Rekomendasi pola hidup sehat</p>
-                                <a href="#" class="btn btn-sm btn-primary">Lihat Detail</a>
-                            </div>
-                        </div>
+                        @endforelse
                     </div>
                 </div>
             </div>
@@ -109,38 +105,30 @@
                     <h6 class="m-0 font-weight-bold text-primary">Resep Aktif</h6>
                 </div>
                 <div class="card-body">
-                    <div class="prescription-item mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="mb-0">Resep #12345</h6>
-                            <span class="badge bg-success">Aktif</span>
+                    @forelse($activePrescriptionList as $prescription)
+                        <div class="prescription-item mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Resep #{{ $prescription->id }}</h6>
+                                <span class="badge bg-success">Aktif</span>
+                            </div>
+                            <p><strong>Dokter:</strong> {{ $prescription->medicalRecord->doctor->user->name }}</p>
+                            <p><strong>Tanggal:</strong> {{ $prescription->issue_date->format('d M Y') }}</p>
+                            <p><strong>Obat:</strong></p>
+                            <ul>
+                                @foreach ($prescription->prescriptionItems as $item)
+                                    <li>{{ $item->medicine->name }} ({{ $item->dosage }}) - {{ $item->frequency }}</li>
+                                @endforeach
+                            </ul>
+                            <p><small class="text-muted">Berlaku hingga:
+                                    {{ $prescription->valid_until->format('d M Y') }}</small></p>
+                            <a href="{{ route('pasien.prescriptions.show', $prescription->id) }}"
+                                class="btn btn-sm btn-primary">Download Resep</a>
                         </div>
-                        <p><strong>Dokter:</strong> dr. Budi Santoso</p>
-                        <p><strong>Tanggal:</strong> 15 Juni 2023</p>
-                        <p><strong>Obat:</strong></p>
-                        <ul>
-                            <li>Paracetamol 500mg (3x1)</li>
-                            <li>Amoxicillin 500mg (3x1)</li>
-                            <li>Vitamin C 500mg (1x1)</li>
-                        </ul>
-                        <p><small class="text-muted">Berlaku hingga: 22 Juni 2023</small></p>
-                        <a href="#" class="btn btn-sm btn-primary">Download Resep</a>
-                    </div>
-
-                    <div class="prescription-item">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="mb-0">Resep #12300</h6>
-                            <span class="badge bg-success">Aktif</span>
+                    @empty
+                        <div class="text-center py-3">
+                            <p class="text-muted">Tidak ada resep aktif</p>
                         </div>
-                        <p><strong>Dokter:</strong> dr. Diana Putri</p>
-                        <p><strong>Tanggal:</strong> 28 April 2023</p>
-                        <p><strong>Obat:</strong></p>
-                        <ul>
-                            <li>Multivitamin (1x1)</li>
-                            <li>Suplemen Kalsium (1x1)</li>
-                        </ul>
-                        <p><small class="text-muted">Berlaku hingga: 28 Juli 2023</small></p>
-                        <a href="#" class="btn btn-sm btn-primary">Download Resep</a>
-                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -153,46 +141,67 @@
                     <h6 class="m-0 font-weight-bold text-primary">Buat Janji Baru</h6>
                 </div>
                 <div class="card-body">
-                    <form>
+                    <form action="{{ route('pasien.appointments.store') }}" method="POST">
+                        @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="doctor" class="form-label">Pilih Dokter</label>
-                                <select class="form-select" id="doctor">
+                                <label for="doctor_id" class="form-label">Pilih Dokter</label>
+                                <select class="form-select @error('doctor_id') is-invalid @enderror" id="doctor_id"
+                                    name="doctor_id">
                                     <option selected disabled>-- Pilih Dokter --</option>
-                                    <option>dr. Budi Santoso (Dokter Umum)</option>
-                                    <option>dr. Diana Putri (Spesialis Gizi)</option>
-                                    <option>dr. Eko Prasetyo (Spesialis Jantung)</option>
-                                    <option>dr. Farida Amir (Spesialis Penyakit Dalam)</option>
+                                    @foreach ($doctors as $doctor)
+                                        <option value="{{ $doctor->id }}">{{ $doctor->user->name }}
+                                            ({{ $doctor->specialization }})
+                                        </option>
+                                    @endforeach
                                 </select>
+                                @error('doctor_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="date" class="form-label">Pilih Tanggal</label>
-                                <input type="date" class="form-control" id="date">
+                                <label for="appointment_date" class="form-label">Pilih Tanggal</label>
+                                <input type="date" class="form-control @error('appointment_date') is-invalid @enderror"
+                                    id="appointment_date" name="appointment_date" min="{{ date('Y-m-d') }}">
+                                @error('appointment_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="time" class="form-label">Pilih Waktu</label>
-                                <select class="form-select" id="time">
+                                <label for="appointment_time" class="form-label">Pilih Waktu</label>
+                                <select class="form-select @error('appointment_time') is-invalid @enderror"
+                                    id="appointment_time" name="appointment_time">
                                     <option selected disabled>-- Pilih Waktu --</option>
-                                    <option>08:00</option>
-                                    <option>09:00</option>
-                                    <option>10:00</option>
-                                    <option>11:00</option>
-                                    <option>13:00</option>
-                                    <option>14:00</option>
-                                    <option>15:00</option>
+                                    <option value="08:00">08:00</option>
+                                    <option value="09:00">09:00</option>
+                                    <option value="10:00">10:00</option>
+                                    <option value="11:00">11:00</option>
+                                    <option value="13:00">13:00</option>
+                                    <option value="14:00">14:00</option>
+                                    <option value="15:00">15:00</option>
                                 </select>
+                                @error('appointment_time')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="reason" class="form-label">Alasan Kunjungan</label>
-                                <input type="text" class="form-control" id="reason"
+                                <input type="text" class="form-control @error('reason') is-invalid @enderror"
+                                    id="reason" name="reason"
                                     placeholder="Contoh: Sakit kepala, konsultasi rutin, dll.">
+                                @error('reason')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="notes" class="form-label">Catatan Tambahan</label>
-                            <textarea class="form-control" id="notes" rows="3"></textarea>
+                            <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" name="notes" rows="3"></textarea>
+                            @error('notes')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <button type="submit" class="btn btn-primary">Buat Janji</button>
                     </form>

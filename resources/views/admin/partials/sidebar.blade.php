@@ -69,7 +69,7 @@
 
     .nav-link:hover,
     .nav-link:focus {
-        background-color: #343a40;
+        background-color: #002549;
         color: #fff;
         border-radius: 0.375rem;
     }
@@ -94,7 +94,7 @@
         text-transform: uppercase;
         padding: 0 1rem;
         margin-bottom: 0.75rem;
-        color: #6c757d;
+        color: #00386a;
         letter-spacing: 0.05em;
     }
 

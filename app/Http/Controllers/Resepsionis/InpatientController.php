@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Resepsionis;
 
 use App\Http\Controllers\Controller;
 use App\Models\Doctor;
@@ -19,8 +19,8 @@ class InpatientController extends Controller
     {
         $search = $request->search ?? '';
         $status = $request->status ?? '';
-        $query = Inpatient::with(['patient', 'room', 'doctor'])->get();
-        $statuses = ['active' => 'Aktif', 'pulang' => 'Pulang', 'dipindahkan' => 'Dipindahkan'];
+
+        $query = Inpatient::query()->with(['patient.user', 'room', 'doctor.user']);
 
         if (!empty($search)) {
             $query->whereHas('patient', function ($q) use ($search) {
@@ -34,7 +34,9 @@ class InpatientController extends Controller
         }
 
         $inpatients = $query->orderBy('created_at', 'desc')->paginate(10);
-        return view('admin.inpatients.index', compact('inpatients', 'statuses', 'search', 'status'));
+        $statuses = ['active' => 'Aktif', 'pulang' => 'Pulang', 'dipindahkan' => 'Dipindahkan'];
+
+        return view('resepsionis.inpatients.index', compact('inpatients', 'statuses', 'search', 'status'));
     }
 
     /**
@@ -43,7 +45,7 @@ class InpatientController extends Controller
     public function show(Inpatient $inpatient)
     {
         $inpatient->load(['patient.user', 'room', 'doctor.user']);
-        return view('admin.inpatients.show', compact('inpatient'));
+        return view('resepsionis.inpatients.show', compact('inpatient'));
     }
 
     /**
@@ -51,10 +53,10 @@ class InpatientController extends Controller
      */
     public function create()
     {
-        $patients = Patient::with('user')->get();
-        $doctors = Doctor::with('user')->get();
+        $patients = Patient::with('user')->where('is_active', true)->get();
+        $doctors = Doctor::with('user')->where('is_active', true)->get();
         $rooms = Room::where('status', 'tersedia')->get();
-        return view('admin.inpatients.create', compact('patients', 'doctors', 'rooms'));
+        return view('resepsionis.inpatients.create', compact('patients', 'doctors', 'rooms'));
     }
 
     /**
@@ -81,7 +83,7 @@ class InpatientController extends Controller
         $room = Room::find($validated['room_id']);
         $room->update(['status' => 'terisi']);
 
-        return redirect()->route('admin.inpatients.index')
+        return redirect()->route('resepsionis.inpatients.index')
             ->with('success', 'Data rawat inap berhasil ditambahkan');
     }
 
@@ -90,13 +92,13 @@ class InpatientController extends Controller
      */
     public function edit(Inpatient $inpatient)
     {
-        $patients = Patient::with('user')->get();
-        $doctors = Doctor::with('user')->get();
+        $patients = Patient::with('user')->where('is_active', true)->get();
+        $doctors = Doctor::with('user')->where('is_active', true)->get();
         $rooms = Room::where('status', 'tersedia')
             ->orWhere('id', $inpatient->room_id)
             ->get();
 
-        return view('admin.inpatients.edit', compact('inpatient', 'patients', 'doctors', 'rooms'));
+        return view('resepsionis.inpatients.edit', compact('inpatient', 'patients', 'doctors', 'rooms'));
     }
 
     /**
@@ -112,7 +114,7 @@ class InpatientController extends Controller
             'check_out_date' => 'nullable|date|after:check_in_date',
             'diagnosis' => 'required|string',
             'treatment_plan' => 'required|string',
-            'status' => 'required|in:active,discharged,transferred',
+            'status' => 'required|in:active,pulang,dipindahkan',
             'notes' => 'nullable|string'
         ]);
 
@@ -129,8 +131,8 @@ class InpatientController extends Controller
             $newRoom->update(['status' => 'terisi']);
         }
 
-        // If status is changed to discharged
-        if ($validated['status'] === 'discharged' && !$inpatient->check_out_date) {
+        // If status is changed to pulang or dipindahkan
+        if (in_array($validated['status'], ['pulang', 'dipindahkan']) && !$inpatient->check_out_date) {
             $validated['check_out_date'] = now();
             $room = Room::find($validated['room_id']);
             $room->update(['status' => 'tersedia']);
@@ -138,7 +140,7 @@ class InpatientController extends Controller
 
         $inpatient->update($validated);
 
-        return redirect()->route('admin.inpatients.index')
+        return redirect()->route('resepsionis.inpatients.index')
             ->with('success', 'Data rawat inap berhasil diperbarui');
     }
 

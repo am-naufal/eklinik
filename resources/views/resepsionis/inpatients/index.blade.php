@@ -35,10 +35,10 @@
                                     <td>
                                         @if ($inpatient->status === 'active')
                                             <span class="badge bg-success">Aktif</span>
-                                        @elseif($inpatient->status === 'discharged')
+                                        @elseif($inpatient->status === 'pulang')
                                             <span class="badge bg-info">Pulang</span>
                                         @else
-                                            <span class="badge bg-warning">Ditransfer</span>
+                                            <span class="badge bg-warning">Dipindahkan</span>
                                         @endif
                                     </td>
                                     <td>

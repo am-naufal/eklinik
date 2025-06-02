@@ -13,7 +13,8 @@
     <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <!-- Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap4-theme@1.0.0/dist/select2-bootstrap4.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap4-theme@1.0.0/dist/select2-bootstrap4.min.css"
+        rel="stylesheet" />
     <style>
         .sidebar {
             min-height: 100vh;
@@ -76,6 +77,50 @@
             border-radius: 50%;
             margin-right: 10px;
         }
+
+        .nav-link {
+            color: #adb5bd;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: background-color 0.2s, color 0.2s;
+            padding: 0.5rem 1rem;
+        }
+
+        .nav-link:hover,
+        .nav-link:focus {
+            background-color: #002549;
+            color: #fff;
+            border-radius: 0.375rem;
+        }
+
+        .nav-link.active {
+            background-color: #0d6efd;
+            color: #fff;
+            border-radius: 0.375rem;
+        }
+
+        .nav-link .fa-fw {
+            width: 1.25em;
+        }
+
+        .nav-item>.collapse .nav-link {
+            padding-left: 2.5rem;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-heading {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            padding: 0 1rem;
+            margin-bottom: 0.75rem;
+            color: #00386a;
+            letter-spacing: 0.05em;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 20px;
+        }
     </style>
     @yield('styles')
 </head>
@@ -123,6 +168,7 @@
                                 </button>
                             </form>
                         </li>
+
                     </ul>
                 </div>
             </div>

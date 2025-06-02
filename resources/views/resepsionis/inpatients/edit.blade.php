@@ -97,12 +97,12 @@
                                     <option value="active"
                                         {{ old('status', $inpatient->status) == 'active' ? 'selected' : '' }}>Aktif
                                     </option>
-                                    <option value="discharged"
-                                        {{ old('status', $inpatient->status) == 'discharged' ? 'selected' : '' }}>Pulang
+                                    <option value="pulang"
+                                        {{ old('status', $inpatient->status) == 'pulang' ? 'selected' : '' }}>Pulang
                                     </option>
-                                    <option value="transferred"
-                                        {{ old('status', $inpatient->status) == 'transferred' ? 'selected' : '' }}>
-                                        Ditransfer</option>
+                                    <option value="dipindahkan"
+                                        {{ old('status', $inpatient->status) == 'dipindahkan' ? 'selected' : '' }}>
+                                        Dipindahkan</option>
                                 </select>
                                 @error('status')
                                     <div class="invalid-feedback">{{ $message }}</div>

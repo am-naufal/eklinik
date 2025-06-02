@@ -190,6 +190,7 @@
                             <div id="medicine-list">
                                 <div class="form-group row medicine-row">
                                     <div class="col-sm-5">
+
                                         <select class="form-control medicine-select" name="medicines[]">
                                             <option value="">Pilih Obat</option>
                                             @foreach ($medicines as $medicine)
@@ -234,7 +235,7 @@
     </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
     <script>
         $(document).ready(function() {
             // Tambah baris obat
@@ -254,4 +255,4 @@
             });
         });
     </script>
-@endsection
+@endpush

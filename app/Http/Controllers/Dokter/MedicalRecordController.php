@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dokter;
 
 use App\Http\Controllers\Controller;
+use App\Models\Appointment;
 use App\Models\Doctor;
 use App\Models\Medicine;
 use App\Models\MedicalRecord;
@@ -31,6 +32,17 @@ class MedicalRecordController extends Controller
         return view('dokter.medical_records.index', compact('medicalRecords'));
     }
 
+    /**
+     * Menampilkan semua rekam medis.
+     */
+    public function showAllMedicalRecords()
+    {
+        $medicalRecords = MedicalRecord::with(['patient', 'prescription'])
+            ->orderBy('record_date', 'desc')
+            ->paginate(50);
+
+        return view('dokter.medical_records.all', compact('medicalRecords'));
+    }
     /**
      * Show the form for creating a new medical record.
      */
@@ -88,6 +100,7 @@ class MedicalRecordController extends Controller
             $medicalRecord = MedicalRecord::create([
                 'patient_id' => $validated['patient_id'],
                 'doctor_id' => $doctor->id,
+                'appointment_id' => $request->appointment_id,
                 'record_date' => $validated['record_date'],
                 'complaint' => $validated['complaint'],
                 'diagnosis' => $validated['diagnosis'],
@@ -140,6 +153,11 @@ class MedicalRecordController extends Controller
                     ]);
                 }
             }
+            $appointment = Appointment::find($request->appointment_id);
+            $appointment->update([
+                'status' => 'Selesai'
+            ]);
+
 
             DB::commit();
 
@@ -166,7 +184,7 @@ class MedicalRecordController extends Controller
         $medicalRecord->load(['patient', 'doctor.user', 'treatments', 'prescription.prescriptionItems.medicine']);
 
         // Debugging - melihat struktur data pasien
-        \Log::info('Patient data structure:', [
+        Log::info('Patient data structure:', [
             'patient' => $medicalRecord->patient,
             'patient_class' => get_class($medicalRecord->patient),
             'patient_attributes' => $medicalRecord->patient->getAttributes()

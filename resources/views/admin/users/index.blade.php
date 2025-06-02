@@ -9,44 +9,6 @@
 
 @section('page-title', 'Manajemen User')
 
-@section('sidebar')
-    <li class="nav-item">
-        <a class="nav-link" href="{{ route('admin.dashboard') }}">
-            <i class="fas fa-fw fa-tachometer-alt me-2"></i>
-            Dashboard
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link active" href="{{ route('admin.users.index') }}">
-            <i class="fas fa-fw fa-users me-2"></i>
-            Manajemen User
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="{{ route('admin.doctors.index') }}">
-            <i class="fas fa-fw fa-user-md me-2"></i>
-            Dokter
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-procedures me-2"></i>
-            Pasien
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-calendar-check me-2"></i>
-            Jadwal
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-cog me-2"></i>
-            Pengaturan
-        </a>
-    </li>
-@endsection
 
 @section('content')
     <div class="card shadow mb-4">
@@ -141,10 +103,11 @@
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print', 'colvis'],
                 ordering: true,
                 responsive: true,
+                lengthChange: true,
+                pageLength: 50,
                 language: {
                     search: "Cari:",
                     lengthMenu: "Tampilkan _MENU_ entri",
-                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
                     infoEmpty: "Tidak ada data tersedia",
                     infoFiltered: "(difilter dari _MAX_ total entri)",
                     zeroRecords: "Tidak ditemukan data",

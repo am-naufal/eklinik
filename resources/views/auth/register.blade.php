@@ -92,6 +92,11 @@
                     <label for="address" class="form-label">Alamat</label>
                     <textarea class="form-control" id="address" name="address" rows="2">{{ old('address') }}</textarea>
                 </div>
+                <div class="mb-3">
+                    <label for="date_of_birth" class="form-label">Tanggal Lahir</label>
+                    <input type="date" class="form-control" id="date_of_birth" name="date_of_birth"
+                        value="{{ old('date_of_birth') }}">
+                </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">

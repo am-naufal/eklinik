@@ -132,11 +132,6 @@
                                             <td>
                                                 <div class="btn-group">
                                                     @if ($appointment->status == 'Selesai')
-                                                        <a href="{{ route('dokter.medical-records.show', $appointment->medical_record_id) }}"
-                                                            class="btn btn-sm btn-primary" data-toggle="tooltip"
-                                                            title="Lihat Rekam Medis">
-                                                            <i class="fas fa-file-medical"></i> Detail
-                                                        </a>
                                                     @elseif($appointment->status == 'Menunggu')
                                                         <a href="{{ route('dokter.appointments.examine', $appointment->id) }}"
                                                             class="btn btn-sm btn-primary" data-toggle="tooltip"
