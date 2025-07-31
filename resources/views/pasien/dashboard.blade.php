@@ -85,7 +85,7 @@
                                     <p>{{ $visit->doctor->user->name }} ({{ $visit->doctor->specialization }})</p>
                                     <p><strong>Diagnosa:</strong> {{ $visit->diagnosis }}</p>
                                     <p><strong>Tindakan:</strong> {{ $visit->treatment }}</p>
-                                    <a href="{{ route('pasien.medical-records.show', $visit->id) }}"
+                                    <a href="{{ route('pasien.medicalrecords.show', $visit->id) }}"
                                         class="btn btn-sm btn-primary">Lihat Detail</a>
                                 </div>
                             </div>
